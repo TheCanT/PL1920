@@ -15,4 +15,4 @@ This project is not licensed
 
 ## Acknowledgments
 
-* Sistemas distribuidos
+* Processamento de Linguagens

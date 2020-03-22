@@ -1,0 +1,25 @@
+=== tree
+.apport-ignore.xml
+.bash_history
+.bash_logout
+config
+Desktop
+Documents
+Music/
+- Pictures/
+-- Public/
+--- snap/
+---- Templates/
+-- app.zip
+-- {%name%}/
+--- class5.exe/
+---- CMakeCache.txt/
+----- {%name%}/
+------ cmake_install.cmake/
+------- CMakeLists.txt/
+------- 'code5(1).zip'
+--- glut32.dll
+main.cpp/
+- Makefile/
+-- bash_logout
+===

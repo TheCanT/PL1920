@@ -1,10 +1,12 @@
 === tree
+
 .apport-ignore.xml
 .bash_history
 .bash_logout
 config
 Desktop
-Documents
+Documentsà
+
 Music/
 - Pictures/
 -- Public/
@@ -19,7 +21,9 @@ Music/
 ------- CMakeLists.txt/
 ------- 'code5(1).zip'
 --- glut32.dll
+
 main.cpp/
 - Makefile/
 -- bash_logout
-===
+
+=== asdsa

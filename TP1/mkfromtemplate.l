@@ -3,35 +3,62 @@
     int branch = 0;
 %}
 
-%s tree
+%s categoria meta tree
 
-upper [A-Z]+
-lower [a-z]+
-digit [0-9]+
+upper [A-Z]
+lower [a-z]
+digit [0-9]
 
-file_name [\x21-\x2E\x30-\x5B\x5D-\x7E]*
-special_name {file_name}\{%name%\}{file_name}
+acentos \xc3[\x80-\xbf]       
+letra [a-zA-Z]|{acentos}
 
-branch_name {file_name}\/
+file_name ([\x21-\x2E\x30-\x5B\x5D-\x7E]|{letra})
+special_name {file_name}*\{%name%\}{file_name}*
+
+branch_name {file_name}+\/
 branch_Sname {special_name}\/
 
+email_character ({upper}|{lower}|{digit}|[\_\-\.])
+email {email_character}+\@{email_character}+\.{email_character}+
 %%
+
+    /* one character match */
+[ \t\r\n] ECHO;
+
+. return 0;
 
     /* flex mkfromtemplate.l && 
        gcc lex.yy.c -o parse_tree -ll && 
        (cat test_tree | ./parse_tree) 
     */
 
-\=\=\=\ tree {
+\{%name%\} ;
+
+\{%author%\} ;
+
+\{%email%\} ;
+
+{email} {
+    ECHO;
+}
+
+
+\=\=\=\  {
+    BEGIN categoria;
+    ECHO;
+}
+
+<categoria>meta {
     ECHO;
     BEGIN tree;
 }
 
-<tree>\=\=\= {
-    printf("ACABOU A TREE\n");
-    return 0;
+<categoria>tree {
+    ECHO;
+    BEGIN tree;
 }
 
+<meta>email: 
 
 <tree>[\-]+\  {
     for(int i = 0; yytext[i] == '-'; i++) {
@@ -41,9 +68,7 @@ branch_Sname {special_name}\/
     printf(" ");
 }
 
-
-<tree>{special_name} { 
-    printf(" -- %d > %d -- ",branch,last_branch);
+<tree>{special_name}$ {
     if(branch > last_branch) return 0;
     ECHO;
     if(branch < last_branch) last_branch = branch;
@@ -51,8 +76,7 @@ branch_Sname {special_name}\/
     BEGIN tree;
 }
 
-<tree>{file_name} {
-    printf(" -- %d > %d -- ",branch,last_branch);
+<tree>{file_name}+$ {
     if(branch > last_branch) return 0;
     ECHO;
     if(branch < last_branch) last_branch = branch;
@@ -60,8 +84,7 @@ branch_Sname {special_name}\/
     BEGIN tree;
 }
 
-<tree>{branch_Sname} {
-    printf(" -- %d > %d -- ",branch,last_branch);
+<tree>{branch_Sname}$ {
     if(branch > last_branch) return 0;
     ECHO;
     last_branch = branch + 1;
@@ -69,8 +92,7 @@ branch_Sname {special_name}\/
     BEGIN tree;
 }
 
-<tree>{branch_name} {
-    printf(" -- %d > %d -- ",branch,last_branch);
+<tree>{branch_name}$ {
     if(branch > last_branch) return 0;
     ECHO;
     last_branch = branch + 1;
@@ -78,11 +100,5 @@ branch_Sname {special_name}\/
     BEGIN tree;
 }
 
-
-
-    /* one character match */
-[ \t\r\n] ECHO;
-
-. return 0;
 
 %%

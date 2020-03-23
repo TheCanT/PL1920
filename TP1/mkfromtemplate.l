@@ -20,6 +20,7 @@ branch_Sname {special_name}\/
 
 email_character ({upper}|{lower}|{digit}|[\_\-\.])
 email {email_character}+\@{email_character}+\.{email_character}+
+    // ^[A-Za-z0-9\_\"]+((\.|\+|\-)[A-Za-z0-9\_\"]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za-z\_\"]+)+$
 %%
 
     /* one character match */

@@ -1,3 +1,25 @@
+=== meta
+
+email: email@example.com
+email: firstname.lastname@example.com
+email: email@subdomain.example.com
+email: firstname+lastname@example.com
+email: "email"@example.com
+email: 1234567890@example.com
+email: email@example-one.com
+email: _______@example.com
+email: email@example.name
+email: email@example.museum
+email: email@example.co.jp
+email: firstname-lastname@example.com
+
+author: Mác Kéètõn
+author: Jess Înks
+author: Eliana A. Chou
+author: Katerine Mcquillan
+author: Mrs. Mirella Luck
+author: Lonny Hennen
+
 === tree
 
 .apport-ignore.xml
@@ -26,4 +48,5 @@ main.cpp/
 - Makefile/
 -- bash_logout
 
-=== asdsa
+=== olaaaa
+

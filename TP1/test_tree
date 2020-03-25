@@ -37,16 +37,17 @@ Music/
 -- app.zip
 -- {%name%}/
 --- class5.exe/
----- CMakeCache.txt/
------ {%name%}/
+---- CMake.txt/
+----- ASD_{%name%}_LOL/
 ------ cmake_install.cmake/
-------- CMakeLists.txt/
+------- abcdABCD{%name%}.AAA.QQQ.XXX.LLL
 ------- 'code5(1).zip'
 --- glut32.dll
 
-main.cpp/
-- Makefile/
--- bash_logout
+Makefile/
+- main>{%name%}>.cpp
+- {%name%}bash_logout
+- bash_logout_{%name%}
 
 === olaaaa
 

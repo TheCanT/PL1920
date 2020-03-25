@@ -1,5 +1,6 @@
 %{
     #include "glib.h"
+    #include "gmodule.h"
 
     int last_branch = 0;
     int branch = 0;
@@ -7,6 +8,49 @@
     char * input_name;
 
     GPtrArray * directory_vector;
+    GPtrArray * this_directory;
+
+    struct directory_st{
+        int depth;
+        char * dir_name;
+    };
+
+    typedef struct directory_st * DIRECTORY;
+
+    DIRECTORY init_directory(int b, char * d){
+        DIRECTORY dir = malloc(sizeof(struct directory_st)); 
+        dir->depth = b;
+        dir->dir_name = strdup(d);
+        return dir;
+    }
+
+    void set_directory(gpointer data, gpointer user_data){
+        DIRECTORY dir = (DIRECTORY) data;
+        g_ptr_array_insert(this_directory,dir->depth,dir);
+    }
+
+    void get_directory(gpointer data, gpointer user_data){
+        DIRECTORY dir = (DIRECTORY) data;
+        GString * s = (GString*) user_data;
+        if(branch >= 0){
+            g_string_append(s,dir->dir_name);
+            branch--;
+        }
+    }
+
+    char * swap_token_for_name(char* s, char* tok, char* name){
+        char* t = strstr(s,tok);
+        char* r = malloc(strlen(s)-strlen(tok)+strlen(name));
+
+    /*    char* token1 = strtok(s,tok);
+        char* token2 = strtok(NULL,tok);
+        if(t == s) puts(" ## 1"),sprintf(r,"%s%s",name,token1);
+        else puts(" ## 2"),sprintf(r,"%s%s%s",token1,name,token2);
+    */
+        sprintf(r,"%s%s%s",strndup(s,t-s),name,strndup(t+strlen(tok),t-s+strlen(tok)));
+        return r;
+    }
+
 %}
 
 %s categoria meta email author tree content
@@ -84,36 +128,70 @@ email [A-Za-z0-9\_\"]+((\.|\+|\-)[A-Za-z0-9\_\"]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-
 <tree>[\-]+\  {
     for(int i = 0; yytext[i] == '-'; i++) {
         branch++;
-        printf("%d",branch);
     }
-    printf(" ");
 }
 
-<tree>{special_name}\n {
+<tree>{special_name}$ {
     if(branch > last_branch) return 0;
-    ECHO;
     if(branch < last_branch) last_branch = branch;
+    
+    char * updated_name = swap_token_for_name(yytext,"{\%name\%}",input_name);
+
+    DIRECTORY ptr = init_directory(branch,updated_name);
+    g_ptr_array_add(directory_vector,(gpointer)ptr);
+    g_ptr_array_foreach(directory_vector,set_directory,NULL);
+    
+    GString * s = g_string_new(NULL);
+    g_ptr_array_foreach(this_directory,get_directory,s);    
+    printf("%s",g_string_free(s,FALSE));
+
     branch = 0;
 }
 
-<tree>{file_name}+\n {
+<tree>{file_name}+$ {
     if(branch > last_branch) return 0;
-    ECHO;
     if(branch < last_branch) last_branch = branch;
+    
+    DIRECTORY ptr = init_directory(branch,yytext);
+    g_ptr_array_add(directory_vector,(gpointer)ptr);
+    g_ptr_array_foreach(directory_vector,set_directory,NULL);
+    
+    GString * s = g_string_new(NULL);
+    g_ptr_array_foreach(this_directory,get_directory,s);    
+    printf("%s",g_string_free(s,FALSE));
+
     branch = 0;
 }
 
-<tree>{branch_Sname}\n {
+<tree>{branch_Sname}$ {
     if(branch > last_branch) return 0;
-    ECHO;
     last_branch = branch + 1;
+    
+    char * updated_Sbranch = swap_token_for_name(yytext,"{\%name\%}",input_name);
+
+    DIRECTORY ptr = init_directory(branch,updated_Sbranch);
+    g_ptr_array_add(directory_vector,(gpointer)ptr);
+    g_ptr_array_foreach(directory_vector,set_directory,NULL);
+    
+    GString * s = g_string_new(NULL);
+    g_ptr_array_foreach(this_directory,get_directory,s);    
+    printf("%s",g_string_free(s,FALSE));
+
     branch = 0;
 }
 
-<tree>{branch_name}\n {
+<tree>{branch_name}$ {
     if(branch > last_branch) return 0;
-    ECHO;
     last_branch = branch + 1;
+    
+    DIRECTORY ptr = init_directory(branch,yytext);
+    g_ptr_array_add(directory_vector,(gpointer)ptr);
+    g_ptr_array_foreach(directory_vector,set_directory,NULL);
+    
+    GString * s = g_string_new(NULL);
+    g_ptr_array_foreach(this_directory,get_directory,s);    
+    printf("%s",g_string_free(s,FALSE));
+
     branch = 0;
 }
 
@@ -127,10 +205,10 @@ email [A-Za-z0-9\_\"]+((\.|\+|\-)[A-Za-z0-9\_\"]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-
 
 %%
 
-
 int main(int argc, char ** argv){
     if(argc>1) input_name = strdup(argv[1]);
     directory_vector = g_ptr_array_new();
+    this_directory = g_ptr_array_new();
     yylex();
     return 1;
 }

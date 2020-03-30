@@ -1,4 +1,8 @@
 %{
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <fcntl.h>
+    #include <sys/stat.h>
     #include "glib.h"
     #include "gmodule.h"
 
@@ -17,19 +21,43 @@
     struct full_dir_st{
         char * name;
         char * dir;
-        long ini;
-        long end;
+        char type;
     };
 
     typedef struct full_dir_st * FULL_DIR;
 
-    FULL_DIR init_full_dir(char * n, char * d){
+    FULL_DIR this_fdir = NULL;
+
+    FULL_DIR init_full_dir(char * n, char * d, char t){
         FULL_DIR fdir = malloc(sizeof(struct full_dir_st)); 
         fdir->name = strdup(n);
         fdir->dir = strdup(d);
-        fdir->ini = 0;
-        fdir->end = 0;
+        fdir->type = t;
         return fdir;
+    }
+
+    gboolean equal_full_dir(gconstpointer a, gconstpointer b){
+        FULL_DIR fdir = (FULL_DIR) a;
+        char* name = (char*) b;
+        if(!strcmp(fdir->name,name) && fdir->type == 'f'){
+            yyout = fopen(fdir->dir,"a+");
+            return TRUE;
+        }
+        return FALSE;
+    }
+    
+    void printit(gpointer data,gpointer user_data){
+        FULL_DIR f = (FULL_DIR) data;
+        if(f->type == 'f') {
+            char * cmd;
+            asprintf(&cmd,"touch %s",f->dir);
+            system(cmd);
+        }
+        if(f->type == 'd') mkdir(f->dir,0755);
+        //puts(f->name);
+        //puts(f->dir);
+        //printf("type -> %c\n",f->type);
+        //puts(""); 
     }
 
 
@@ -99,15 +127,23 @@ branch_Sname {special_name}\/
 email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za-z\_\"]+)+
 %%
 
-\{%name%\} printf("%s",input_name);
+\{%name%\} fprintf(yyout,"%s",input_name);
 
-\{%author%\} printf("%s",author);
+\{%author%\} fprintf(yyout,"%s",author);
 
-\{%email%\} printf("%s",email);
+\{%email%\} fprintf(yyout,"%s",email);
 
+
+<TREE>^\=\=\=\  {
+    BEGIN CATEGORY;
+    g_ptr_array_foreach(final_directories,printit,NULL);
+    ECHO;
+}
+ 
 
 ^\=\=\=\  {
     BEGIN CATEGORY;
+    yyout = stdout;
     ECHO;
 }
 
@@ -123,13 +159,22 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 }
 
 <CATEGORY>{special_name}$ {
-    printf("%s",swap_token_for_name(yytext,"{\%name\%}",input_name));
+    char * name = swap_token_for_name(yytext,"{\%name\%}",input_name);
+    printf("%s",name);
     BEGIN CONTENT;
+
+    if(this_fdir == NULL){
+        g_ptr_array_find_with_equal_func(final_directories,name,equal_full_dir,NULL);
+    }
 }
 
 <CATEGORY>{file_name}+$ {
     ECHO;
     BEGIN CONTENT;
+    
+    if(this_fdir == NULL){
+        g_ptr_array_find_with_equal_func(final_directories,yytext,equal_full_dir,NULL);
+    }
 }
 
 <META>email:\  BEGIN EMAIL;
@@ -161,8 +206,11 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if(branch < last_branch) last_branch = branch;
     
     char * updated_name = swap_token_for_name(yytext,"{\%name\%}",input_name);
-  
-    printf("%s",full_path(updated_name));
+    char * dir = full_path(updated_name) ;
+
+    printf("%s",dir);
+
+    g_ptr_array_add(final_directories,init_full_dir(updated_name,dir,'f'));
 
     branch = 0;
 }
@@ -171,7 +219,11 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if(branch > last_branch) return 0;
     if(branch < last_branch) last_branch = branch;
     
-    printf("%s",full_path(yytext));
+    char* dir = full_path(yytext);
+
+    printf("%s",dir);
+
+    g_ptr_array_add(final_directories,init_full_dir(yytext,dir,'f'));
 
     branch = 0;
 }
@@ -181,8 +233,11 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     last_branch = branch + 1;
     
     char * updated_Sbranch = swap_token_for_name(yytext,"{\%name\%}",input_name);
+    char * dir = full_path(updated_Sbranch);
 
-    printf("%s",full_path(updated_Sbranch));
+    printf("%s",dir);
+
+    g_ptr_array_add(final_directories,init_full_dir(updated_Sbranch,dir,'d'));
 
     branch = 0;
 }
@@ -191,11 +246,14 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if(branch > last_branch) return 0;
     last_branch = branch + 1;
     
-    printf("%s",full_path(yytext));
+    char* dir =full_path(yytext);
+
+    printf("%s",dir);
+
+    g_ptr_array_add(final_directories,init_full_dir(yytext,dir,'d'));
 
     branch = 0;
 }
-
 
 
 <CONTENT>{letra}+ ECHO;
@@ -211,6 +269,8 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 %%
 
+
+
 int main(int argc, char ** argv){
     if(argc>2){
         input_name = strdup(argv[1]);
@@ -218,6 +278,7 @@ int main(int argc, char ** argv){
     }
     directory_vector = g_ptr_array_new();
     this_directory = g_ptr_array_new();
+    final_directories = g_ptr_array_new();
     yylex();
     return 1;
 }

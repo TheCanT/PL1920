@@ -1,6 +1,6 @@
 %{
+    #define _GNU_SOURCE
     #include <stdio.h>
-    #include <stdlib.h>
     #include <fcntl.h>
     #include <sys/stat.h>
     #include "glib.h"
@@ -48,16 +48,21 @@
     
     void printit(gpointer data,gpointer user_data){
         FULL_DIR f = (FULL_DIR) data;
-        if(f->type == 'f') {
-            char * cmd;
-            asprintf(&cmd,"touch %s",f->dir);
-            system(cmd);
+        char * cmd;
+
+        switch(f->type) {
+            case 'f':
+                asprintf(&cmd,"touch %s",f->dir);
+                system(cmd);
+                break;
+            
+            case 'd':
+                mkdir(f->dir,0755);
+                break;
+
+            default:
+                break;
         }
-        if(f->type == 'd') mkdir(f->dir,0755);
-        //puts(f->name);
-        //puts(f->dir);
-        //printf("type -> %c\n",f->type);
-        //puts(""); 
     }
 
 
@@ -125,26 +130,19 @@ branch_name {file_name}+\/
 branch_Sname {special_name}\/
 
 email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za-z\_\"]+)+
+
 %%
-
-\{%name%\} fprintf(yyout,"%s",input_name);
-
-\{%author%\} fprintf(yyout,"%s",author);
-
-\{%email%\} fprintf(yyout,"%s",email);
-
 
 <TREE>^\=\=\=\  {
     BEGIN CATEGORY;
     g_ptr_array_foreach(final_directories,printit,NULL);
-    ECHO;
 }
  
 
 ^\=\=\=\  {
     BEGIN CATEGORY;
+    if(yyout != stdout) fclose(yyout);
     yyout = stdout;
-    ECHO;
 }
 
 
@@ -160,7 +158,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <CATEGORY>{special_name}$ {
     char * name = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    printf("%s",name);
+    printf("loading: %s\n",name);
     BEGIN CONTENT;
 
     if(this_fdir == NULL){
@@ -169,7 +167,9 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 }
 
 <CATEGORY>{file_name}+$ {
+    printf("loading: ");
     ECHO;
+    puts("");
     BEGIN CONTENT;
     
     if(this_fdir == NULL){
@@ -256,6 +256,10 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 }
 
 
+
+<CONTENT>\{%name%\} fprintf(yyout,"%s",input_name);
+<CONTENT>\{%author%\} fprintf(yyout,"%s",author);
+<CONTENT>\{%email%\} fprintf(yyout,"%s",email);
 <CONTENT>{letra}+ ECHO;
 <CONTENT>. ECHO;
 

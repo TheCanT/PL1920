@@ -10,3 +10,8 @@ clean:
 	rm parse_tree lex.yy.c
 	rm -rf Programa
 	clear
+
+retry:
+	make clean
+	make exec
+	make test

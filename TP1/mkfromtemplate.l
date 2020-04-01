@@ -36,16 +36,35 @@
         return fdir;
     }
 
-    gboolean equal_full_dir(gconstpointer a, gconstpointer b){
+    gboolean equal_full_dir1(gconstpointer a, gconstpointer b){
         FULL_DIR fdir = (FULL_DIR) a;
         char* name = (char*) b;
         if(!strcmp(fdir->name,name) && fdir->type == 'f'){
             yyout = fopen(fdir->dir,"a+");
             return TRUE;
         }
+        else return FALSE;
+    }
+    
+    gboolean equal_full_dir(gconstpointer a, gconstpointer b){
+        FULL_DIR fdir = (FULL_DIR) a;
+        char* name = (char*) b;
+        if(!strcmp(fdir->name,name)){
+            return TRUE;
+        }
         return FALSE;
     }
     
+    int check_duplicate_dir(char * n){
+        int i = -1;
+        g_ptr_array_find_with_equal_func(final_directories,n,equal_full_dir,&i);
+        if(i!=-1) {
+            puts("dir already exists");
+            return 0;
+        }
+        return 1;
+    }
+
     void printit(gpointer data,gpointer user_data){
         FULL_DIR f = (FULL_DIR) data;
         char * cmd;
@@ -97,7 +116,7 @@
     char * full_path(char * name){
         DIRECTORY ptr = init_directory(branch,name);
         g_ptr_array_add(directory_vector,(gpointer)ptr);
-        g_ptr_array_foreach(directory_vector,set_directory,NULL);
+        g_ptr_array_insert(this_directory,ptr->depth,ptr);
     
         GString * s = g_string_new(NULL);
         g_ptr_array_foreach(this_directory,get_directory,s);
@@ -134,6 +153,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 %%
 
 <TREE>^\=\=\=\  {
+    puts("The tree is correct.");
     BEGIN CATEGORY;
     g_ptr_array_foreach(final_directories,printit,NULL);
 }
@@ -147,12 +167,12 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 
 <CATEGORY>meta$ {
-    ECHO;
+    puts("Parsing meta:");
     BEGIN META;
 }
 
 <CATEGORY>tree$ {
-    ECHO;
+    puts("Parsing tree:");
     BEGIN TREE;
 }
 
@@ -162,7 +182,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     BEGIN CONTENT;
 
     if(this_fdir == NULL){
-        g_ptr_array_find_with_equal_func(final_directories,name,equal_full_dir,NULL);
+        g_ptr_array_find_with_equal_func(final_directories,name,equal_full_dir1,NULL);
     }
 }
 
@@ -173,14 +193,14 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     BEGIN CONTENT;
     
     if(this_fdir == NULL){
-        g_ptr_array_find_with_equal_func(final_directories,yytext,equal_full_dir,NULL);
+        g_ptr_array_find_with_equal_func(final_directories,yytext,equal_full_dir1,NULL);
     }
 }
 
 <META>email:\  BEGIN EMAIL;
 
 <EMAIL>{email}$ {
-    ECHO;
+    printf("EMAIL ---> %s\n",yytext);
     email = strdup(yytext);
     BEGIN META;
 }
@@ -188,17 +208,16 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 <META>author:\  BEGIN AUTHOR;
 
 <AUTHOR>({letra}+(\.)?(\ )?)+$ {
-    ECHO;
+    printf("AUTHOR --> %s\n",yytext);
     author = strdup(yytext);
     BEGIN META;
 }
 
-<META>\#.*$ ECHO;
+<META>\#.*$ ;
 
 <TREE>[\-]+\  {
-    for(int i = 0; yytext[i] == '-'; i++) {
+    for(int i = 0; yytext[i] == '-'; i++)
         branch++;
-    }
 }
 
 <TREE>{special_name}$ {
@@ -206,10 +225,9 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if(branch < last_branch) last_branch = branch;
     
     char * updated_name = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    char * dir = full_path(updated_name) ;
-
-    printf("%s",dir);
-
+    if (!check_duplicate_dir(updated_name)) return 0;
+    
+    char * dir = full_path(updated_name);
     g_ptr_array_add(final_directories,init_full_dir(updated_name,dir,'f'));
 
     branch = 0;
@@ -219,9 +237,9 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if(branch > last_branch) return 0;
     if(branch < last_branch) last_branch = branch;
     
-    char* dir = full_path(yytext);
+    if (!check_duplicate_dir(yytext)) return 0;
 
-    printf("%s",dir);
+    char* dir = full_path(yytext);
 
     g_ptr_array_add(final_directories,init_full_dir(yytext,dir,'f'));
 
@@ -233,10 +251,9 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     last_branch = branch + 1;
     
     char * updated_Sbranch = swap_token_for_name(yytext,"{\%name\%}",input_name);
+    if (!check_duplicate_dir(updated_Sbranch)) return 0;
+    
     char * dir = full_path(updated_Sbranch);
-
-    printf("%s",dir);
-
     g_ptr_array_add(final_directories,init_full_dir(updated_Sbranch,dir,'d'));
 
     branch = 0;
@@ -245,11 +262,10 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 <TREE>{branch_name}$ {
     if(branch > last_branch) return 0;
     last_branch = branch + 1;
+
+    if (!check_duplicate_dir(yytext)) return 0;
     
-    char* dir =full_path(yytext);
-
-    printf("%s",dir);
-
+    char* dir = full_path(yytext);
     g_ptr_array_add(final_directories,init_full_dir(yytext,dir,'d'));
 
     branch = 0;
@@ -265,7 +281,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 
     /* one character match */
-[ \t\r\n] ECHO;
+[ \t\r\n] ;
 
 . return 0;
 

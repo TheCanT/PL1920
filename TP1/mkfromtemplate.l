@@ -18,6 +18,7 @@
     GPtrArray * final_directories;
 
 
+
     struct full_dir_st{
         char * name;
         char * dir;
@@ -28,61 +29,16 @@
 
     FULL_DIR this_fdir = NULL;
 
-    FULL_DIR init_full_dir(char * n, char * d, char t){
-        FULL_DIR fdir = malloc(sizeof(struct full_dir_st)); 
-        fdir->name = strdup(n);
-        fdir->dir = strdup(d);
-        fdir->type = t;
-        return fdir;
-    }
+    FULL_DIR init_full_dir(char * n, char * d, char t);
 
-    gboolean equal_full_dir1(gconstpointer a, gconstpointer b){
-        FULL_DIR fdir = (FULL_DIR) a;
-        char* name = (char*) b;
-        if(!strcmp(fdir->name,name) && fdir->type == 'f'){
-            yyout = fopen(fdir->dir,"a+");
-            return TRUE;
-        }
-        else return FALSE;
-    }
+    gboolean equal_full_dir1(gconstpointer a, gconstpointer b);
     
-    gboolean equal_full_dir(gconstpointer a, gconstpointer b){
-        FULL_DIR fdir = (FULL_DIR) a;
-        char* name = (char*) b;
-        if(!strcmp(fdir->name,name)){
-            return TRUE;
-        }
-        return FALSE;
-    }
+    gboolean equal_full_dir(gconstpointer a, gconstpointer b);
     
-    int check_duplicate_dir(char * n){
-        int i = -1;
-        g_ptr_array_find_with_equal_func(final_directories,n,equal_full_dir,&i);
-        if(i!=-1) {
-            puts("dir already exists");
-            return 0;
-        }
-        return 1;
-    }
+    int check_duplicate_dir(char * n);
 
-    void printit(gpointer data,gpointer user_data){
-        FULL_DIR f = (FULL_DIR) data;
-        char * cmd;
+    void printit(gpointer data,gpointer user_data);
 
-        switch(f->type) {
-            case 'f':
-                asprintf(&cmd,"touch %s",f->dir);
-                system(cmd);
-                break;
-            
-            case 'd':
-                mkdir(f->dir,0755);
-                break;
-
-            default:
-                break;
-        }
-    }
 
 
     struct directory_st{
@@ -92,44 +48,17 @@
 
     typedef struct directory_st * DIRECTORY;
 
-    DIRECTORY init_directory(int b, char * d){
-        DIRECTORY dir = malloc(sizeof(struct directory_st)); 
-        dir->depth = b;
-        dir->dir_name = strdup(d);
-        return dir;
-    }
+    DIRECTORY init_directory(int b, char * d);
 
-    void set_directory(gpointer data, gpointer user_data){
-        DIRECTORY dir = (DIRECTORY) data;
-        g_ptr_array_insert(this_directory,dir->depth,dir);
-    }
+    void set_directory(gpointer data, gpointer user_data);
 
-    void get_directory(gpointer data, gpointer user_data){
-        DIRECTORY dir = (DIRECTORY) data;
-        GString * s = (GString*) user_data;
-        if(branch >= 0){
-            g_string_append(s,dir->dir_name);
-            branch--;
-        }
-    }
+    void get_directory(gpointer data, gpointer user_data);
 
-    char * full_path(char * name){
-        DIRECTORY ptr = init_directory(branch,name);
-        g_ptr_array_add(directory_vector,(gpointer)ptr);
-        g_ptr_array_insert(this_directory,ptr->depth,ptr);
-    
-        GString * s = g_string_new(NULL);
-        g_ptr_array_foreach(this_directory,get_directory,s);
-        return strdup(g_string_free(s,FALSE));
-    }
+    char * full_path(char * name);
 
 
-    char * swap_token_for_name(char * s, char * tok, char * name){
-        char * t = strstr(s,tok);
-        char * r = malloc(strlen(s)-strlen(tok)+strlen(name));
-        sprintf(r,"%s%s%s",strndup(s,t-s),name,strndup(t+strlen(tok),t-s+strlen(tok)));
-        return r;
-    }
+
+    char * swap_token_for_name(char * s, char * tok, char * name);
 
 %}
 
@@ -277,7 +206,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 <CONTENT>\{%author%\} fprintf(yyout,"%s",author);
 <CONTENT>\{%email%\} fprintf(yyout,"%s",email);
 <CONTENT>{letra}+ ECHO;
-<CONTENT>. ECHO;
+<CONTENT>.|\n ECHO;
 
 
     /* one character match */
@@ -302,3 +231,104 @@ int main(int argc, char ** argv){
     yylex();
     return 1;
 }
+
+
+  // FULL DIRECTORY SECTION
+
+    FULL_DIR init_full_dir(char * n, char * d, char t){
+        FULL_DIR fdir = malloc(sizeof(struct full_dir_st)); 
+        fdir->name = strdup(n);
+        fdir->dir = strdup(d);
+        fdir->type = t;
+        return fdir;
+    }
+
+    gboolean equal_full_dir1(gconstpointer a, gconstpointer b){
+        FULL_DIR fdir = (FULL_DIR) a;
+        char* name = (char*) b;
+        if(!strcmp(fdir->name,name) && fdir->type == 'f'){
+            yyout = fopen(fdir->dir,"a+");
+            return TRUE;
+        }
+        else return FALSE;
+    }
+    
+    gboolean equal_full_dir(gconstpointer a, gconstpointer b){
+        FULL_DIR fdir = (FULL_DIR) a;
+        char* name = (char*) b;
+        if(!strcmp(fdir->name,name)){
+            return TRUE;
+        }
+        return FALSE;
+    }
+    
+    int check_duplicate_dir(char * n){
+        int i = -1;
+        g_ptr_array_find_with_equal_func(final_directories,n,equal_full_dir,&i);
+        if(i!=-1) {
+            puts("dir already exists");
+            return 0;
+        }
+        return 1;
+    }
+
+    void printit(gpointer data,gpointer user_data){
+        FULL_DIR f = (FULL_DIR) data;
+        char * cmd;
+
+        switch(f->type) {
+            case 'f':
+                asprintf(&cmd,"touch %s",f->dir);
+                system(cmd);
+                break;
+            
+            case 'd':
+                mkdir(f->dir,0755);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+  // DIRECTORY SECTION
+
+    DIRECTORY init_directory(int b, char * d){
+        DIRECTORY dir = malloc(sizeof(struct directory_st)); 
+        dir->depth = b;
+        dir->dir_name = strdup(d);
+        return dir;
+    }
+
+    // acho que não é mais necessário
+    void set_directory(gpointer data, gpointer user_data){
+        DIRECTORY dir = (DIRECTORY) data;
+        g_ptr_array_insert(this_directory,dir->depth,dir);
+    }
+
+    void get_directory(gpointer data, gpointer user_data){
+        DIRECTORY dir = (DIRECTORY) data;
+        GString * s = (GString*) user_data;
+        if(branch >= 0){
+            g_string_append(s,dir->dir_name);
+            branch--;
+        }
+    }
+
+    char * full_path(char * name){
+        DIRECTORY ptr = init_directory(branch,name);
+        g_ptr_array_add(directory_vector,(gpointer)ptr);
+        g_ptr_array_insert(this_directory,ptr->depth,ptr);
+    
+        GString * s = g_string_new(NULL);
+        g_ptr_array_foreach(this_directory,get_directory,s);
+        return strdup(g_string_free(s,FALSE));
+    }
+
+
+    char * swap_token_for_name(char * s, char * tok, char * name){
+        char * t = strstr(s,tok);
+        char * r = malloc(strlen(s)-strlen(tok)+strlen(name));
+        sprintf(r,"%s%s%s",strndup(s,t-s),name,strndup(t+strlen(tok),t-s+strlen(tok)));
+        return r;
+    }

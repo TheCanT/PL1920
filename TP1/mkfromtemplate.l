@@ -35,7 +35,9 @@
     
     gboolean equal_full_dir(gconstpointer a, gconstpointer b);
     
-    int check_duplicate_dir(char * n);
+    int duplicate_dir(char * n);
+
+    int get_index_of_full_dir(char * n);
 
     void printit(gpointer data,gpointer user_data);
 
@@ -62,7 +64,7 @@
 
 %}
 
-%s CATEGORY META EMAIL AUTHOR TREE CONTENT
+%s CATEGORY META EMAIL AUTHOR TREE CONTENT VOID
 
 upper [A-Z]
 lower [a-z]
@@ -107,23 +109,27 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <CATEGORY>{special_name}$ {
     char * name = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    printf("loading: %s\n",name);
     BEGIN CONTENT;
 
-    if(this_fdir == NULL){
-        g_ptr_array_find_with_equal_func(final_directories,name,equal_full_dir1,NULL);
+    int i;
+    if((i = get_index_of_full_dir(name)) > -1){
+        FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
+        yyout = fopen(fdr->dir,"a+");
+        printf("loading: %s\n",name);
     }
+    else {ECHO; puts("File does not belong to the tree"); BEGIN VOID;}
 }
 
 <CATEGORY>{file_name}+$ {
-    printf("loading: ");
-    ECHO;
-    puts("");
     BEGIN CONTENT;
     
-    if(this_fdir == NULL){
-        g_ptr_array_find_with_equal_func(final_directories,yytext,equal_full_dir1,NULL);
+    int i;
+    if((i = get_index_of_full_dir(yytext)) > -1){
+        FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
+        yyout = fopen(fdr->dir,"a+");
+        printf("loading: %s\n",yytext);
     }
+    else {ECHO; puts("File does not belong to the tree"); BEGIN VOID;}
 }
 
 <META>email:\  BEGIN EMAIL;
@@ -154,7 +160,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if(branch < last_branch) last_branch = branch;
     
     char * updated_name = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    if (!check_duplicate_dir(updated_name)) return 0;
+    if (!duplicate_dir(updated_name)) return 0;
     
     char * dir = full_path(updated_name);
     g_ptr_array_add(final_directories,init_full_dir(updated_name,dir,'f'));
@@ -166,7 +172,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if(branch > last_branch) return 0;
     if(branch < last_branch) last_branch = branch;
     
-    if (!check_duplicate_dir(yytext)) return 0;
+    if (!duplicate_dir(yytext)) return 0;
 
     char* dir = full_path(yytext);
 
@@ -180,7 +186,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     last_branch = branch + 1;
     
     char * updated_Sbranch = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    if (!check_duplicate_dir(updated_Sbranch)) return 0;
+    if (!duplicate_dir(updated_Sbranch)) return 0;
     
     char * dir = full_path(updated_Sbranch);
     g_ptr_array_add(final_directories,init_full_dir(updated_Sbranch,dir,'d'));
@@ -192,7 +198,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if(branch > last_branch) return 0;
     last_branch = branch + 1;
 
-    if (!check_duplicate_dir(yytext)) return 0;
+    if (!duplicate_dir(yytext)) return 0;
     
     char* dir = full_path(yytext);
     g_ptr_array_add(final_directories,init_full_dir(yytext,dir,'d'));
@@ -208,6 +214,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 <CONTENT>{letra}+ ECHO;
 <CONTENT>.|\n ECHO;
 
+<VOID>[.\n \t\r] ;
 
     /* one character match */
 [ \t\r\n] ;
@@ -262,7 +269,7 @@ int main(int argc, char ** argv){
         return FALSE;
     }
     
-    int check_duplicate_dir(char * n){
+    int duplicate_dir(char * n){
         int i = -1;
         g_ptr_array_find_with_equal_func(final_directories,n,equal_full_dir,&i);
         if(i!=-1) {
@@ -270,6 +277,12 @@ int main(int argc, char ** argv){
             return 0;
         }
         return 1;
+    }
+
+    int get_index_of_full_dir(char * n){
+        int i = -1;
+        g_ptr_array_find_with_equal_func(final_directories,n,equal_full_dir,&i);
+        return i;
     }
 
     void printit(gpointer data,gpointer user_data){

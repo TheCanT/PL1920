@@ -22,13 +22,6 @@ author: Lonny Hennen
 
 === tree
 
-.apport-ignore.xml
-.bash_history
-.bash_logout
-config
-Desktop
-Documentsà
-
 Music/
 - Pictures/
 -- Public/
@@ -44,10 +37,9 @@ Music/
 ------- 'code5(1).zip'
 --- glut32.dll
 
-Makefile/
-- main>{%name%}>.cpp
-- {%name%}bash_logout
-- bash_logout_{%name%}
+ola/
+- ddd
+- kkk
 
 === olaaaa
 

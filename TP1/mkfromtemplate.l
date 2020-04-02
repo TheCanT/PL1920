@@ -92,8 +92,10 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 ^\=\=\=\  {
     BEGIN CATEGORY;
-    if(yyout != stdout) fclose(yyout);
-    yyout = stdout;
+    if(yyout != stdout){
+        fclose(yyout);
+        yyout = stdout;
+    }
 }
 
 
@@ -140,21 +142,21 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <META>email:\  BEGIN EMAIL;
 
+<META>author:\  BEGIN AUTHOR;
+
+<META>\#.*$ ;
+
 <EMAIL>{email}$ {
     printf("EMAIL ---> %s\n",yytext);
     email = strdup(yytext);
     BEGIN META;
 }
 
-<META>author:\  BEGIN AUTHOR;
-
 <AUTHOR>({letra}+(\.)?(\ )?)+$ {
     printf("AUTHOR --> %s\n",yytext);
     author = strdup(yytext);
     BEGIN META;
 }
-
-<META>\#.*$ ;
 
 <TREE>[\-]+\  {
     for(int i = 0; yytext[i] == '-'; i++)

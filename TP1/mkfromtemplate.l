@@ -115,9 +115,12 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if((i = get_index_of_full_dir(name)) > -1){
         FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
         yyout = fopen(fdr->dir,"a+");
-        printf("loading: %s\n",name);
+        printf("Valid file loading: %s\n",name);
     }
-    else {ECHO; puts("File does not belong to the tree"); BEGIN VOID;}
+    else {
+        printf("Invalid file: %s\n",name);
+        BEGIN VOID;
+    }
 }
 
 <CATEGORY>{file_name}+$ {
@@ -127,9 +130,12 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if((i = get_index_of_full_dir(yytext)) > -1){
         FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
         yyout = fopen(fdr->dir,"a+");
-        printf("loading: %s\n",yytext);
+        printf("Valid file loading: %s\n",yytext);
     }
-    else {ECHO; puts("File does not belong to the tree"); BEGIN VOID;}
+    else {
+        printf("Invalid file: %s\n",yytext);
+        BEGIN VOID;
+    }
 }
 
 <META>email:\  BEGIN EMAIL;
@@ -214,7 +220,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 <CONTENT>{letra}+ ECHO;
 <CONTENT>.|\n ECHO;
 
-<VOID>[.\n \t\r] ;
+<VOID>.|[ \t\r\n] ;
 
     /* one character match */
 [ \t\r\n] ;

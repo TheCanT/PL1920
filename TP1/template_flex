@@ -40,6 +40,9 @@ install: {%name%}
 ## Author
 
 Comments and bug reports to {%author%}, {%email%}.
+=== asdadasdasd
+
+diqwii
 
 === {%name%}.fl
 %option noyywrap yylineno

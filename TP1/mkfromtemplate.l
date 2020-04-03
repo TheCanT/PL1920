@@ -32,7 +32,7 @@
 
     int get_index_of_full_dir(char * n);
 
-    void printit(gpointer data,gpointer user_data);
+    void create_tree(gpointer data,gpointer user_data);
 
 
 
@@ -75,7 +75,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 <TREE>^\=\=\=\  {
     puts("The tree is correct.");
     BEGIN CATEGORY;
-    g_ptr_array_foreach(final_directories,printit,NULL);
+    g_ptr_array_foreach(final_directories,create_tree,NULL);
 }
 
 <CONTENT>^\=\=\=\  {
@@ -351,7 +351,7 @@ int main(int argc, char ** argv){
         return i;
     }
 
-    void printit(gpointer data,gpointer user_data){
+    void create_tree(gpointer data,gpointer user_data){
         FULL_DIR f = (FULL_DIR) data;
         char * cmd;
 

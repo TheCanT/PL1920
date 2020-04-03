@@ -13,8 +13,8 @@
     char * email = NULL;
     char * author = NULL;
 
-    GPtrArray * this_directory;
-    GPtrArray * final_directories;
+    GPtrArray * this_directory = NULL;
+    GPtrArray * final_directories = NULL;
 
 
 
@@ -25,8 +25,6 @@
     };
 
     typedef struct full_dir_st * FULL_DIR;
-
-    FULL_DIR this_fdir = NULL;
 
     FULL_DIR init_full_dir(char * n, char * d, char t);
     
@@ -61,10 +59,6 @@
 
 %s CATEGORY META EMAIL AUTHOR TREE CONTENT VOID
 
-upper [A-Z]
-lower [a-z]
-digit [0-9]
-
 acentos \xc3[\x80-\xbf]       
 letra [a-zA-Z]|{acentos}
 
@@ -83,9 +77,8 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     BEGIN CATEGORY;
     g_ptr_array_foreach(final_directories,printit,NULL);
 }
- 
 
-^\=\=\=\  {
+<CONTENT>^\=\=\=\  {
     BEGIN CATEGORY;
     if(yyout != stdout){
         fclose(yyout);
@@ -93,19 +86,38 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     }
 }
 
+^\=\=\=\  {
+    BEGIN CATEGORY;
+}
+
 
 <CATEGORY>meta$ {
+    if (email != NULL || author != NULL) {
+        puts("The \"=== meta\" can only be written once.");
+        return 0;
+    }
     puts("Parsing meta:");
     BEGIN META;
 }
 
 <CATEGORY>tree$ {
+    if (this_directory != NULL || final_directories != NULL) {
+        puts("The \"=== tree\" can only be written once.");
+        return 0;
+    }
+    this_directory = g_ptr_array_new();
+    final_directories = g_ptr_array_new();
     puts("Parsing tree:");
     BEGIN TREE;
 }
 
 <CATEGORY>{special_name}$ {
-    BEGIN CONTENT;
+    if (this_directory == NULL || final_directories == NULL) {
+        printf("This \"=== %s\" must come after \"=== tree\"",yytext);
+        if (email == NULL || author == NULL) printf(" and \"=== metta\"");
+        printf(".\n");
+        return 0;
+    }
 
     char * name = swap_token_for_name(yytext,"{\%name\%}",input_name);
     int i;
@@ -126,12 +138,18 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
         else {
             yyout = fopen(fdr->dir,"a+");
             printf("Valid file loading: %s\n",name);
+            BEGIN CONTENT;
         }
     }
 }
 
 <CATEGORY>{file_name}+$ {
-    BEGIN CONTENT;
+    if (this_directory == NULL || final_directories == NULL || email == NULL || author == NULL) {
+        printf("The \"=== %s\" must come after \"=== tree\"",yytext);
+        printf(" and \"=== metta\"");
+        printf(".\n");
+        return 0;
+    }
     
     int i;
     i = get_index_of_full_dir(yytext);
@@ -150,6 +168,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
         else {
             yyout = fopen(fdr->dir,"a+");
             printf("Valid file loading: %s\n",yytext);
+            BEGIN CONTENT;
         }
     }
 }
@@ -161,16 +180,27 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 <META>\#.*$ ;
 
 <EMAIL>{email}$ {
+    if (email != NULL) {
+        puts("You can only assign one email.");
+        return 0;
+    }
+
     printf("EMAIL ---> %s\n",yytext);
     email = strdup(yytext);
     BEGIN META;
 }
 
 <AUTHOR>({letra}+(\.)?(\ )?)+$ {
+    if (author != NULL) {
+        puts("You can only assign one author.");
+        return 0;
+    }
+
     printf("AUTHOR --> %s\n",yytext);
     author = strdup(yytext);
     BEGIN META;
 }
+
 
 <TREE>[\-]+\  {
     for(int i = 0; yytext[i] == '-'; i++)
@@ -182,6 +212,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
         printf("Error in branch for \"%s\"\n",yytext);
         return 0;
     }
+
     if (branch < last_branch) last_branch = branch;
 
     char * updated_name = swap_token_for_name(yytext,"{\%name\%}",input_name);
@@ -201,6 +232,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
         printf("Error in branch for \"%s\"\n",yytext);
         return 0;
     }
+
     if(branch < last_branch) last_branch = branch;
     
     if (!duplicate_dir(yytext)) {
@@ -220,6 +252,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
         printf("Error in branch for \"%s\"\n",yytext);
         return 0;
     }
+
     last_branch = branch + 1;
     
     char * name = strndup(yytext,yyleng-1);
@@ -240,6 +273,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
         printf("Error in branch for \"%s\"\n",yytext);
         return 0;
     }
+
     last_branch = branch + 1;
 
     char * name = strndup(yytext,yyleng-1);
@@ -267,7 +301,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     /* one character match */
 [ \t\r\n] ;
 
-. return 0;
+. {puts("Syntatic error."); return 0;}
 
 <<EOF>> {puts("EOF"); return 0;}
 
@@ -280,8 +314,6 @@ int main(int argc, char ** argv){
         input_name = strdup(argv[1]);
         yyin = fopen(argv[2],"r");
     }
-    this_directory = g_ptr_array_new();
-    final_directories = g_ptr_array_new();
     yylex();
     return 1;
 }

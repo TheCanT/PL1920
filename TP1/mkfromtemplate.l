@@ -13,7 +13,6 @@
     char * email = NULL;
     char * author = NULL;
 
-    GPtrArray * directory_vector;
     GPtrArray * this_directory;
     GPtrArray * final_directories;
 
@@ -30,10 +29,6 @@
     FULL_DIR this_fdir = NULL;
 
     FULL_DIR init_full_dir(char * n, char * d, char t);
-
-    gboolean equal_full_dir1(gconstpointer a, gconstpointer b);
-    
-    gboolean equal_full_dir(gconstpointer a, gconstpointer b);
     
     int duplicate_dir(char * n);
 
@@ -110,18 +105,28 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 }
 
 <CATEGORY>{special_name}$ {
-    char * name = swap_token_for_name(yytext,"{\%name\%}",input_name);
     BEGIN CONTENT;
 
+    char * name = swap_token_for_name(yytext,"{\%name\%}",input_name);
     int i;
-    if((i = get_index_of_full_dir(name)) > -1){
-        FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
-        yyout = fopen(fdr->dir,"a+");
-        printf("Valid file loading: %s\n",name);
+    i = get_index_of_full_dir(yytext);
+
+    if (i < 0) {
+        printf("Invalid name file: %s\n",yytext);
+        BEGIN VOID;
+        return 1;
     }
     else {
-        printf("Invalid file: %s\n",name);
-        BEGIN VOID;
+        FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
+
+        if (fdr->type != 'f') {
+            printf("It's a directory: %s\n",name);
+            BEGIN VOID;
+        }
+        else {
+            yyout = fopen(fdr->dir,"a+");
+            printf("Valid file loading: %s\n",name);
+        }
     }
 }
 
@@ -129,14 +134,23 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     BEGIN CONTENT;
     
     int i;
-    if((i = get_index_of_full_dir(yytext)) > -1){
-        FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
-        yyout = fopen(fdr->dir,"a+");
-        printf("Valid file loading: %s\n",yytext);
+    i = get_index_of_full_dir(yytext);
+
+    if (i < 0) {
+        printf("Invalid name file: %s\n",yytext);
+        BEGIN VOID;
     }
     else {
-        printf("Invalid file: %s\n",yytext);
-        BEGIN VOID;
+        FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
+
+        if (fdr->type != 'f') {
+            printf("It's a directory: %s\n",yytext);
+            BEGIN VOID;
+        }
+        else {
+            yyout = fopen(fdr->dir,"a+");
+            printf("Valid file loading: %s\n",yytext);
+        }
     }
 }
 
@@ -164,23 +178,35 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 }
 
 <TREE>{special_name}$ {
-    if(branch > last_branch) return 0;
-    if(branch < last_branch) last_branch = branch;
-    
+    if(branch > last_branch) {
+        printf("Error in branch for \"%s\"\n",yytext);
+        return 0;
+    }
+    if (branch < last_branch) last_branch = branch;
+
     char * updated_name = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    if (!duplicate_dir(updated_name)) return 0;
+    if (!duplicate_dir(yytext)) {
+        printf("Duplicated directory \"%s\"\n",yytext);
+        return 0;
+    }
     
     char * dir = full_path(updated_name);
-    g_ptr_array_add(final_directories,init_full_dir(updated_name,dir,'f'));
+    g_ptr_array_add(final_directories,init_full_dir(yytext,dir,'f'));
 
     branch = 0;
 }
 
 <TREE>{file_name}+$ {
-    if(branch > last_branch) return 0;
+    if(branch > last_branch) {
+        printf("Error in branch for \"%s\"\n",yytext);
+        return 0;
+    }
     if(branch < last_branch) last_branch = branch;
     
-    if (!duplicate_dir(yytext)) return 0;
+    if (!duplicate_dir(yytext)) {
+        printf("Duplicated directory \"%s\"\n",yytext);
+        return 0;
+    }
 
     char* dir = full_path(yytext);
 
@@ -190,26 +216,40 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 }
 
 <TREE>{branch_Sname}$ {
-    if(branch > last_branch) return 0;
+    if(branch > last_branch) {
+        printf("Error in branch for \"%s\"\n",yytext);
+        return 0;
+    }
     last_branch = branch + 1;
     
+    char * name = strndup(yytext,yyleng-1);
     char * updated_Sbranch = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    if (!duplicate_dir(updated_Sbranch)) return 0;
-    
+    if (!duplicate_dir(name)) {
+        printf("Duplicated directory \"%s\"\n",yytext);
+        return 0;
+    }
+
     char * dir = full_path(updated_Sbranch);
-    g_ptr_array_add(final_directories,init_full_dir(updated_Sbranch,dir,'d'));
+    g_ptr_array_add(final_directories,init_full_dir(name,dir,'d'));
 
     branch = 0;
 }
 
 <TREE>{branch_name}$ {
-    if(branch > last_branch) return 0;
+    if(branch > last_branch) {
+        printf("Error in branch for \"%s\"\n",yytext);
+        return 0;
+    }
     last_branch = branch + 1;
 
-    if (!duplicate_dir(yytext)) return 0;
+    char * name = strndup(yytext,yyleng-1);
+    if (!duplicate_dir(name)) {
+        printf("Duplicated directory \"%s\"\n",yytext);
+        return 0;
+    }
     
     char* dir = full_path(yytext);
-    g_ptr_array_add(final_directories,init_full_dir(yytext,dir,'d'));
+    g_ptr_array_add(final_directories,init_full_dir(name,dir,'d'));
 
     branch = 0;
 }
@@ -240,7 +280,6 @@ int main(int argc, char ** argv){
         input_name = strdup(argv[1]);
         yyin = fopen(argv[2],"r");
     }
-    directory_vector = g_ptr_array_new();
     this_directory = g_ptr_array_new();
     final_directories = g_ptr_array_new();
     yylex();
@@ -257,18 +296,8 @@ int main(int argc, char ** argv){
         fdir->type = t;
         return fdir;
     }
-
-    gboolean equal_full_dir1(gconstpointer a, gconstpointer b){
-        FULL_DIR fdir = (FULL_DIR) a;
-        char* name = (char*) b;
-        if(!strcmp(fdir->name,name) && fdir->type == 'f'){
-            yyout = fopen(fdir->dir,"a+");
-            return TRUE;
-        }
-        else return FALSE;
-    }
     
-    gboolean equal_full_dir(gconstpointer a, gconstpointer b){
+    gboolean equal_name_dir(gconstpointer a, gconstpointer b){
         FULL_DIR fdir = (FULL_DIR) a;
         char* name = (char*) b;
         if(!strcmp(fdir->name,name)){
@@ -279,17 +308,14 @@ int main(int argc, char ** argv){
     
     int duplicate_dir(char * n){
         int i = -1;
-        g_ptr_array_find_with_equal_func(final_directories,n,equal_full_dir,&i);
-        if(i!=-1) {
-            puts("dir already exists");
-            return 0;
-        }
-        return 1;
+        g_ptr_array_find_with_equal_func(final_directories,n,equal_name_dir,&i);
+        if (i != -1) return 0;
+        else return 1;
     }
 
     int get_index_of_full_dir(char * n){
         int i = -1;
-        g_ptr_array_find_with_equal_func(final_directories,n,equal_full_dir,&i);
+        g_ptr_array_find_with_equal_func(final_directories,n,equal_name_dir,&i);
         return i;
     }
 
@@ -338,7 +364,6 @@ int main(int argc, char ** argv){
 
     char * full_path(char * name){
         DIRECTORY ptr = init_directory(branch,name);
-        g_ptr_array_add(directory_vector,(gpointer)ptr);
         g_ptr_array_insert(this_directory,ptr->depth,ptr);
     
         GString * s = g_string_new(NULL);

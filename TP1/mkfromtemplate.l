@@ -62,7 +62,7 @@ file_character ([\x21-\x2E\x30-\x5B\x5D-\x7E]|{letra})
 file_name {file_character}+
 special_name {file_name}*\{%name%\}{file_name}*
 
-branch_name {file_name}+\/
+branch_name {file_name}\/
 branch_Sname {special_name}\/
 
 email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za-z\_\"]+)+

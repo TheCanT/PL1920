@@ -1,10 +1,13 @@
 %{
-    #define _GNU_SOURCE
     #include <stdio.h>
     #include <fcntl.h>
     #include <sys/stat.h>
     #include "glib.h"
     #include "gmodule.h"
+
+    extern char * asprintf();
+
+    int line = 1;
 
     int last_branch = 0;
     int branch = 0;
@@ -124,7 +127,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     i = get_index_of_full_dir(yytext);
 
     if (i < 0) {
-        printf("Invalid name file: %s\n",yytext);
+        printf("Invalid name file: %s (line %d)\n",yytext,line);
         BEGIN VOID;
         return 1;
     }
@@ -132,12 +135,12 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
         FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
 
         if (fdr->type != 'f') {
-            printf("It's a directory: %s\n",name);
+            printf("It's a directory: %s (line %d)\n",yytext,line);
             BEGIN VOID;
         }
         else {
             yyout = fopen(fdr->dir,"a+");
-            printf("Valid file loading: %s\n",name);
+            printf("Valid file loading: %s (line %d)\n",yytext,line);
             BEGIN CONTENT;
         }
     }
@@ -155,19 +158,19 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     i = get_index_of_full_dir(yytext);
 
     if (i < 0) {
-        printf("Invalid name file: %s\n",yytext);
+        printf("Invalid name file: %s (line %d)\n",yytext,line);
         BEGIN VOID;
     }
     else {
         FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
 
         if (fdr->type != 'f') {
-            printf("It's a directory: %s\n",yytext);
+            printf("It's a directory: %s (line %d)\n",yytext,line);
             BEGIN VOID;
         }
         else {
             yyout = fopen(fdr->dir,"a+");
-            printf("Valid file loading: %s\n",yytext);
+            printf("Valid file loading: %s (line %d)\n",yytext,line);
             BEGIN CONTENT;
         }
     }
@@ -209,7 +212,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <TREE>{special_name}$ {
     if(branch > last_branch) {
-        printf("Error in branch for \"%s\"\n",yytext);
+        printf("Error in branch for \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
 
@@ -217,7 +220,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
     char * updated_name = swap_token_for_name(yytext,"{\%name\%}",input_name);
     if (!duplicate_dir(yytext)) {
-        printf("Duplicated directory \"%s\"\n",yytext);
+        printf("Duplicated directory \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
     
@@ -229,14 +232,14 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <TREE>{file_name}+$ {
     if(branch > last_branch) {
-        printf("Error in branch for \"%s\"\n",yytext);
+        printf("Error in branch for \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
 
     if(branch < last_branch) last_branch = branch;
     
     if (!duplicate_dir(yytext)) {
-        printf("Duplicated directory \"%s\"\n",yytext);
+        printf("Duplicated directory \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
 
@@ -249,7 +252,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <TREE>{branch_Sname}$ {
     if(branch > last_branch) {
-        printf("Error in branch for \"%s\"\n",yytext);
+        printf("Error in branch for \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
 
@@ -258,7 +261,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     char * name = strndup(yytext,yyleng-1);
     char * updated_Sbranch = swap_token_for_name(yytext,"{\%name\%}",input_name);
     if (!duplicate_dir(name)) {
-        printf("Duplicated directory \"%s\"\n",yytext);
+        printf("Duplicated directory \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
 
@@ -270,7 +273,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <TREE>{branch_name}$ {
     if(branch > last_branch) {
-        printf("Error in branch for \"%s\"\n",yytext);
+        printf("Error in branch for \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
 
@@ -278,7 +281,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
     char * name = strndup(yytext,yyleng-1);
     if (!duplicate_dir(name)) {
-        printf("Duplicated directory \"%s\"\n",yytext);
+        printf("Duplicated directory \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
     
@@ -294,14 +297,17 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 <CONTENT>\{%author%\} fprintf(yyout,"%s",author);
 <CONTENT>\{%email%\} fprintf(yyout,"%s",email);
 <CONTENT>{letra}+ ECHO;
-<CONTENT>.|\n ECHO;
+<CONTENT>. ECHO;
+<CONTENT>\n {line++; ECHO;}
 
-<VOID>.|[ \t\r\n] ;
+<VOID>.|[ \t\r] ;
+<VOID>\n line++;
 
     /* one character match */
-[ \t\r\n] ;
+[ \t\r] ;
+\n line++;
 
-. {puts("Syntatic error."); return 0;}
+. {printf("Syntatic error. (\"%s\" line %d)",yytext,line); return 0;}
 
 <<EOF>> {puts("EOF"); return 0;}
 

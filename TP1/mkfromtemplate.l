@@ -46,14 +46,7 @@
 
     typedef struct directory_st * DIRECTORY;
 
-    DIRECTORY init_directory(int b, char * d);
-
-    void set_directory(gpointer data, gpointer user_data);
-
-    void get_directory(gpointer data, gpointer user_data);
-
     char * full_path(char * name);
-
 
 
     char * swap_token_for_name(char * s, char * tok, char * name);
@@ -292,19 +285,25 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 }
 
 
-
 <CONTENT>\{%name%\} fprintf(yyout,"%s",input_name);
+
 <CONTENT>\{%author%\} fprintf(yyout,"%s",author);
+
 <CONTENT>\{%email%\} fprintf(yyout,"%s",email);
+
 <CONTENT>{letra}+ ECHO;
+
 <CONTENT>. ECHO;
+
 <CONTENT>\n {line++; ECHO;}
 
 <VOID>.|[ \t\r] ;
+
 <VOID>\n line++;
 
     /* one character match */
 [ \t\r] ;
+
 \n line++;
 
 . {printf("Syntatic error. (\"%s\" line %d)",yytext,line); return 0;}

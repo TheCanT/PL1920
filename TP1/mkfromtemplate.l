@@ -20,7 +20,6 @@
     GPtrArray * final_directories = NULL;
 
 
-
     struct full_dir_st{
         char * name;
         char * dir;
@@ -58,7 +57,9 @@
 acentos \xc3[\x80-\xbf]       
 letra [a-zA-Z]|{acentos}
 
-file_name ([\x21-\x2E\x30-\x5B\x5D-\x7E]|{letra})
+file_character ([\x21-\x2E\x30-\x5B\x5D-\x7E]|{letra})
+
+file_name {file_character}+
 special_name {file_name}*\{%name%\}{file_name}*
 
 branch_name {file_name}+\/
@@ -76,10 +77,8 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <CONTENT>^\=\=\=\  {
     BEGIN CATEGORY;
-    if(yyout != stdout){
-        fclose(yyout);
-        yyout = stdout;
-    }
+    fclose(yyout);
+    yyout = stdout;
 }
 
 ^\=\=\=\  {
@@ -139,7 +138,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     }
 }
 
-<CATEGORY>{file_name}+$ {
+<CATEGORY>{file_name}$ {
     if (this_directory == NULL || final_directories == NULL || email == NULL || author == NULL) {
         printf("The \"=== %s\" must come after \"=== tree\"",yytext);
         printf(" and \"=== metta\"");
@@ -223,7 +222,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     branch = 0;
 }
 
-<TREE>{file_name}+$ {
+<TREE>{file_name}$ {
     if(branch > last_branch) {
         printf("Error in branch for \"%s\" (line %d)\n",yytext,line);
         return 0;

@@ -70,7 +70,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 %%
 
 <TREE>^\=\=\=\  {
-    puts("The tree is correct.");
+    puts("The tree is correct, building tree. ");
     BEGIN CATEGORY;
     g_ptr_array_foreach(final_directories,create_tree,NULL);
 }

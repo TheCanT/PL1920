@@ -3,7 +3,7 @@ exec: mkfromtemplate.l
 	flex mkfromtemplate.l
 	gcc lex.yy.c `pkg-config --cflags --libs glib-2.0` -o mkfromtemplate -ll
 	
-test:
+test: exec
 	./mkfromtemplate Programa template_flex
 
 clean:
@@ -11,7 +11,5 @@ clean:
 	rm -rf Programa
 	clear
 
-retry:
-	make clean
-	make exec
-	make test
+zip: mkfromtemplate.l template_flex Makefile
+	zip G15_TP1_EX1.zip mkfromtemplate.l Makefile template_flex

@@ -106,38 +106,6 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     BEGIN TREE;
 }
 
-<CATEGORY>{special_name}$ {
-    if (this_directory == NULL || final_directories == NULL) {
-        printf("This \"=== %s\" must come after \"=== tree\"",yytext);
-        if (email == NULL || author == NULL) printf(" and \"=== metta\"");
-        printf(".\n");
-        return 0;
-    }
-
-    char * name = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    int i;
-    i = get_index_of_full_dir(yytext);
-
-    if (i < 0) {
-        printf("Invalid name file: %s (line %d)\n",yytext,line);
-        BEGIN VOID;
-        return 1;
-    }
-    else {
-        FULL_DIR fdr = (FULL_DIR) g_ptr_array_index(final_directories,i);
-
-        if (fdr->type != 'f') {
-            printf("It's a directory: %s (line %d)\n",yytext,line);
-            BEGIN VOID;
-        }
-        else {
-            yyout = fopen(fdr->dir,"a+");
-            printf("Valid file loading: %s (line %d)\n",yytext,line);
-            BEGIN CONTENT;
-        }
-    }
-}
-
 <CATEGORY>{file_name}$ {
     if (this_directory == NULL || final_directories == NULL || email == NULL || author == NULL) {
         printf("The \"=== %s\" must come after \"=== tree\"",yytext);

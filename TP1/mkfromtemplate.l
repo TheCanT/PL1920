@@ -266,8 +266,6 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
 <VOID>.|[ \t\r] ;
 
-<VOID>\n line++;
-
     /* one character match */
 [ \t\r] ;
 

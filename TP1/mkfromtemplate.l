@@ -30,7 +30,7 @@
 
     FULL_DIR init_full_dir(char * n, char * d, char t);
     
-    int duplicate_dir(char * n);
+    int duplicated_dir(char * n);
 
     int get_index_of_full_dir(char * n);
 
@@ -179,7 +179,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     if (branch < last_branch) last_branch = branch;
 
     char * updated_name = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    if (!duplicate_dir(yytext)) {
+    if (!duplicated_dir(yytext)) {
         printf("Duplicated directory \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
@@ -198,7 +198,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
 
     if(branch < last_branch) last_branch = branch;
     
-    if (!duplicate_dir(yytext)) {
+    if (!duplicated_dir(yytext)) {
         printf("Duplicated directory \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
@@ -220,7 +220,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     
     char * name = strndup(yytext,yyleng-1);
     char * updated_Sbranch = swap_token_for_name(yytext,"{\%name\%}",input_name);
-    if (!duplicate_dir(name)) {
+    if (!duplicated_dir(name)) {
         printf("Duplicated directory \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
@@ -240,7 +240,7 @@ email [A-Za-z0-9\_\]+((\.|\+|\-)[A-Za-z0-9\_\]+)*\@[A-Za-z\_\"]+((\.|\+|\-)[A-Za
     last_branch = branch + 1;
 
     char * name = strndup(yytext,yyleng-1);
-    if (!duplicate_dir(name)) {
+    if (!duplicated_dir(name)) {
         printf("Duplicated directory \"%s\" (line %d)\n",yytext,line);
         return 0;
     }
@@ -308,7 +308,7 @@ int main(int argc, char ** argv){
         return FALSE;
     }
     
-    int duplicate_dir(char * n){
+    int duplicated_dir(char * n){
         int i = -1;
         g_ptr_array_find_with_equal_func(final_directories,n,equal_name_dir,&i);
         if (i != -1) return 0;

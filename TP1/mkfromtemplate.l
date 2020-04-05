@@ -289,7 +289,7 @@ int main(int argc, char ** argv){
 }
 
 
-  // FULL DIRECTORY SECTION
+    // FULL DIRECTORY SECTION
 
     FULL_DIR init_full_dir(char * n, char * d, char t){
         FULL_DIR fdir = malloc(sizeof(struct full_dir_st)); 
@@ -340,19 +340,13 @@ int main(int argc, char ** argv){
         }
     }
 
-  // DIRECTORY SECTION
+    // DIRECTORY SECTION
 
     DIRECTORY init_directory(int b, char * d){
         DIRECTORY dir = malloc(sizeof(struct directory_st)); 
         dir->depth = b;
         dir->dir_name = strdup(d);
         return dir;
-    }
-
-    // acho que não é mais necessário
-    void set_directory(gpointer data, gpointer user_data){
-        DIRECTORY dir = (DIRECTORY) data;
-        g_ptr_array_insert(this_directory,dir->depth,dir);
     }
 
     void get_directory(gpointer data, gpointer user_data){

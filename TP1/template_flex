@@ -3,7 +3,7 @@
 email: jj@di.uminho.pt
 author: J.João
 
-# "name" Ã© dado por argumento de linha de comando (argv[1])
+# "name" é dado por argumento de linha de comando (argv[1])
 
 === tree
 
@@ -40,6 +40,7 @@ install: {%name%}
 ## Author
 
 Comments and bug reports to {%author%}, {%email%}.
+
 === {%name%}.fl
 %option noyywrap yylineno
 %%
@@ -51,4 +52,4 @@ int main(){
 }
 === README
 
-FIXME: descriÃ§Ã£o sumÃ¡ria do filtro
+FIXME: descrição sumária do filtro

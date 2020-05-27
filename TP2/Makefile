@@ -10,5 +10,8 @@ lex.yy.o : lex.yy.c
 y.tab.c y.tab.h : tomltojson.y
 	yacc -d tomltojson.y
 
-lex.yy.c : tomltojson.l y.tab.h
+lex.yy.c : tomltoken.l y.tab.h
 	flex tomltoken.l
+
+clean :
+	rm -rf y.tab.c y.tab.h  *.o lex.yy.c tomltojson.exe

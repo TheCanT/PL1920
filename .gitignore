@@ -53,3 +53,5 @@ dkms.conf
 
 # ignore flex
 **.yy.c
+**.tab.c
+**.tab.h

@@ -34,7 +34,12 @@ int erroSem(char*);
 
 %%
 
-S : Pair '$';
+S : Pair SequencePairs '$';
+
+SequencePairs
+    : Pair SequencePairs
+    |
+    ;
 
 
 InLineTable
@@ -67,11 +72,13 @@ Pair
 
 Key 
     : key {printf("%s",$1);} DotedKey {printf(" = ");}
+    | string {printf("%s",$1);} DotedKey {printf(" = ");}
     ;
 
 
 DotedKey 
     : '.' key DotedKey {printf(".%s",$2);}
+    | '.' string DotedKey {printf(".%s",$2);}
     | 
     ;
 

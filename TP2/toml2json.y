@@ -55,7 +55,8 @@ List
 
 Listable
     : Value
-    | Value ',' Listable 
+    | Value ',' Listable
+    | Value ',' {printf("vazio\n");}
     ;
 
 
@@ -83,7 +84,6 @@ Value
     | date      {printf("%s\n",$1);}
     | List
     | InLineTable
-    | {printf("vazio\n");}
     ;
 
 %%

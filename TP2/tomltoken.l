@@ -56,16 +56,15 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 {boolean_regex}     { yylval.svalue = strdup(yytext); return boolean; }
 
-{integer_regex}     { puts("INTEGER"); yylval.svalue = strdup(yytext); return integer; }
+{integer_regex}     { /*puts("INTEGER")*/; yylval.svalue = strdup(yytext); return integer; }
 
-{float_regex}       { puts("FLOAT"); yylval.svalue = strdup(yytext); return yyfloat; }
+{float_regex}       { /*puts("FLOAT")*/; yylval.svalue = strdup(yytext); return yyfloat; }
 
 {date_regex}        { yylval.svalue = strdup(yytext); return date; }
 
 {key_regex}         { yylval.svalue = strdup(yytext); return key; }
 
 {string_regex}      { yylval.svalue = strdup(yytext); return string; }
-
 
 {comment_regex} ;
 

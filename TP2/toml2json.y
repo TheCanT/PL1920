@@ -68,7 +68,7 @@ Key
     : key {printf("%s",$1);} DotedKey {printf(" = ");}
     ;
 
-// maybe try to fix this
+
 DotedKey 
     : '.' key DotedKey {printf(".%s",$2);}
     | 

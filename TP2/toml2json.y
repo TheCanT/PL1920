@@ -65,14 +65,13 @@ Pair
 
 
 Key 
-    : key {printf("%s = ",$1);}
-    | DotedKey '.' key {printf(".%s = ",$3);}
+    : key {printf("%s",$1);} DotedKey {printf(" = ");}
     ;
 
 // maybe try to fix this
 DotedKey 
-    : DotedKey '.' key {printf(".%s",$3);}
-    | key {printf("%s",$1);}
+    : '.' key DotedKey {printf(".%s",$2);}
+    | 
     ;
 
 

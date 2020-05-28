@@ -65,25 +65,24 @@ Listable
     ;
 
 
-Pair 
-    : Key '=' Value
+Pair
+    : Key '=' {printf(" = ");} Value
     ;
 
 
-Key 
-    : key {printf("%s",$1);} DotedKey {printf(" = ");}
-    | string {printf("%s",$1);} DotedKey {printf(" = ");}
+Key
+    : key {printf("%s",$1);} DotedKey
+    | string {printf("%s",$1);} DotedKey
     ;
 
 
-DotedKey 
-    : '.' key DotedKey {printf(".%s",$2);}
-    | '.' string DotedKey {printf(".%s",$2);}
+DotedKey
+    : '.' {printf(".");} Key
     | 
     ;
 
 
-Value 
+Value
     : string    {printf("%s\n",$1);}
     | yyfloat   {printf("%s\n",$1);}
     | integer   {printf("%s\n",$1);}

@@ -29,8 +29,8 @@ int erroSem(char*);
 
 // uninon values
 %token <svalue> string key boolean date
-%token <ivalue> integer
-%token <fvalue> yyfloat
+%token <svalue> integer
+%token <svalue> yyfloat
 
 %%
 
@@ -78,8 +78,8 @@ DotedKey
 
 Value 
     : string    {printf("%s\n",$1);}
-    | yyfloat   {printf("%f\n",$1);}
-    | integer   {printf("%d\n",$1);}
+    | yyfloat   {printf("%s\n",$1);}
+    | integer   {printf("%s\n",$1);}
     | boolean   {printf("%s\n",$1);}
     | date      {printf("%s\n",$1);}
     | List

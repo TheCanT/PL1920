@@ -34,52 +34,65 @@ int erroSem(char*);
 
 %%
 
-S : Pair SequencePairs '$';
+S : SequencePairs '$';
+
 
 SequencePairs
     : Pair SequencePairs
     |
-    ;
+;
+
+//    | Table SequencePairs
+//    | ArrayOfTables SequencePairs
+
+//Table
+//    : 
+//;
+
+
+//ArrayOfTables
+//    :
+//;
 
 
 InLineTable
     : {printf("{");} '{' InLinable '}' {printf("}\n");}
-    ;
+;
 
 
 InLinable
     : Pair
     | Pair ',' InLinable
-    ;
+;
 
 
 List
     :  {printf("[");} '[' Listable ']' {printf("]\n");}
-    ;
+;
 
 
 Listable
     : Value
     | Value ',' Listable
     | Value ',' {printf("vazio\n");}
-    ;
+;
 
 
 Pair
     : Key '=' {printf(" = ");} Value
-    ;
+;
 
 
 Key
-    : key {printf("%s",$1);} DotedKey
-    | string {printf("%s",$1);} DotedKey
-    ;
+    : DotedKey key {printf("%s",$2);}
+    | DotedKey string {printf("%s",$2);}
+;
 
 
 DotedKey
-    : '.' {printf(".");} Key
-    | 
-    ;
+    : Key '.' {printf(".");}
+    | //passa uma hashtable
+;
 
 
 Value
@@ -90,7 +103,7 @@ Value
     | date      {printf("%s\n",$1);}
     | List
     | InLineTable
-    ;
+;
 
 %%
 

@@ -85,7 +85,7 @@ Pair
 
 Key
     : DotedKey key {printf("%s",$2);}
-    | DotedKey string {printf("%s",$2);}
+//    | DotedKey string {printf("%s",$2);}
 ;
 
 

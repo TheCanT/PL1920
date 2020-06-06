@@ -1,6 +1,8 @@
 %{
 #include "y.tab.h"
+//%x VALUE PAIR
 %}
+
 
 dig [0-9]
 signal [\+\-]
@@ -12,7 +14,7 @@ comment_regex #.*$
 boolean_regex (true|false)
 
 key [A-Za-z0-9_\-]+
-key_quotes \"{key}\"
+key_quotes \"[^"]*\"
 
 key_regex ({key}|{key_quotes})
 
@@ -52,23 +54,35 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 %%
 [ \t\n\r] ;
 
-[\=\.\}\{\]\[\,]    { return yytext[0]; }
+[\.\,]    { return yytext[0]; }
 
-{boolean_regex}     { yylval.svalue = strdup(yytext); return boolean; }
+\} { return yytext[0]; }
 
-{integer_regex}     { /*puts("INTEGER")*/; yylval.svalue = strdup(yytext); return integer; }
+\{ { return yytext[0]; }
+   
+\] { return yytext[0]; }
 
-{float_regex}       { /*puts("FLOAT")*/; yylval.svalue = strdup(yytext); return yyfloat; }
+\[ { return yytext[0]; }
 
-{date_regex}        { yylval.svalue = strdup(yytext); return date; }
+\= { return yytext[0]; }
 
-{key_regex}         { yylval.svalue = strdup(yytext); return key; }
+{boolean_regex}     { puts("\nBOOL :"); yylval.svalue = strdup(yytext); return boolean; }
 
-{string_regex}      { yylval.svalue = strdup(yytext); return string; }
+{integer_regex}     { puts("\nINT :"); yylval.svalue = strdup(yytext); return integer; }
+
+{float_regex}       { puts("\nFLOAT :"); yylval.svalue = strdup(yytext); return yyfloat; }
+
+{date_regex}        { puts("\nDATE :"); yylval.svalue = strdup(yytext); return date; }
+
+{key_regex}         { puts("\nKEY :"); yylval.svalue = strdup(yytext); return key; }
+
+{string_regex}      { puts("\nSTR :"); yylval.svalue = strdup(yytext); return string; }
 
 {comment_regex} ;
 
 \$                  { return yytext[0]; }
+
+<<EOF>>             { puts("EOF"); return '$'; }
 
 .                   { puts("LOL ERRO TOKENS"); return 0; }
 

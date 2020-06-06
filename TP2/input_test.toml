@@ -1,27 +1,17 @@
 # Pair with a inline table which contains lists
-"pair.one" = {
-
-    fl0."at-s" = [
-        +1.0,
-        3.1415,
-        -0.01,
-        5e+22,
-        1e06,
-        -2E-2,
-        6.626e-34,
+"pair.one" = { fl0."at-s" = [
+        +1.0, 3.1415, -0.01,
+        5e+22, 1e06, -2E-2, 6.626e-34,
         224_617.445_991_228,
         inf, +inf, -inf,
-        nan, +nan, -nan ] ,
-
-    1nt_s   = [
+        nan, +nan, -nan 
+        ] , 1nt_s   = [
         +99, 42, 0, -17,
         1_000, 5_349_221, 1_2_3_4_5,
         0xDEADBEEF, 0xdeadbeef,
         0o755,
         0b11010110,
-        ] ,
-
-    "d4".t3s  = [
+        ] , "d4".t3s  = [
         1979-05-27T07:32:00Z,
         1979-05-27T00:32:00-07:00,
         1979-05-27T00:32:00.999999-07:00,
@@ -29,10 +19,10 @@
         1979-05-27T00:32:00.999999,
         1979-05-27,
         07:32:00,
-        00:32:00.999999 ]
-}
+        00:32:00.999999 ] }
 
-complex.1_1.3."pair" = [true, false, ]
+complex."booleans" = [true, false, ]
 
+complex."string#" = "this is a #string"
 
-$$
+#git commit -m "Switch toml example and the examples from toml lang github."

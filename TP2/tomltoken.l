@@ -50,7 +50,10 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 
 %s VALUE IN_LINE_TABLE LIST
-
+/*
+%token OPEN_TABLE CLOSE_TABLE
+%token OPEN_ARRAY_OF_TABLES CLOSE_ARRAY_OF_TABLES
+*/
 %%
 
 <VALUE>\n { yy_pop_state(); }
@@ -60,45 +63,67 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 
 \. {
-    return yytext[0];
+    return KEY_TOKEN;
 }
 
 
 <VALUE,LIST,IN_LINE_TABLE>\, {
     if(YYSTATE == VALUE) yy_pop_state();
-    return yytext[0]; 
+    return SEPARATE_VALUES; 
 }
 
 
 <VALUE,IN_LINE_TABLE>\} {
     yy_pop_state();
     if(YYSTATE == VALUE) yy_pop_state();
-    return yytext[0];
+    return CLOSE_IN_LINE_TABLE;
 }
 
 
 <VALUE,LIST>\{ {
     yy_push_state(IN_LINE_TABLE);
-    return yytext[0];
+    return OPEN_IN_LINE_TABLE;
 }
 
 
 <LIST>\] {
     yy_pop_state();
     if(YYSTATE == VALUE) yy_pop_state();
-    return yytext[0];
+    return CLOSE_LIST;
 }
 
 
 <VALUE>\[ {
     yy_push_state(LIST);
-    return yytext[0];
+    return OPEN_LIST;
+}
+
+
+\] {
+    puts("\nCLOSE_TABLE");
+    return CLOSE_TABLE;
+}
+
+
+\[ {
+    return OPEN_TABLE;
+}
+
+
+\]\] {
+    puts("\nCLOSE_ARRAY_OF_TABLES");
+    return CLOSE_ARRAY_OF_TABLES;
+}
+
+
+\[\[ {
+    return OPEN_ARRAY_OF_TABLES;
 }
 
 
 \= {
     yy_push_state(VALUE);
-    return yytext[0];
+    return KEY_EQ_VALUE;
 }
 
 
@@ -153,14 +178,8 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 {comment_regex} ;
 
 
-\$ {
-   return yytext[0];
-}
-
-
 <<EOF>> {
-   puts("EOF");
-   return '$';
+   return END;
 }
 
 

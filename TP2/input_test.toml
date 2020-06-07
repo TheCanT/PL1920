@@ -26,6 +26,15 @@
 
 complex."booleans" = [true, false, ]
 
-complex."string#" = "thisisastring"
+"complex.string#" = "thisisastring"
 
 #git commit -m "Fix the lex with tokens, so that we know the state we are in."
+
+[a-table]
+
+[a-table.inside]
+
+[[a-table.inside.nestedArray]]
+
+[[a-table.inside.nestedArray]]
+

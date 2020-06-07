@@ -18,79 +18,83 @@ int erroSem(char*);
     char * svalue;
 }
 
-//%token ERRO HALT PRINT READ SHOW IF ELSE 
-//%token NOT EQUAL LT LE GT GE
-//%token <ivalue> num 
-//%token <cvalue> id
-//%token <svalue> comentario string
-//%type <ivalue> Fator Termo Exp
 
-//%token FIM
+%token OPEN_LIST            CLOSE_LIST              // '[' ']'
+%token OPEN_IN_LINE_TABLE   CLOSE_IN_LINE_TABLE     // '{' '}'
+%token OPEN_TABLE           CLOSE_TABLE             // '[' ']'
+%token OPEN_ARRAY_OF_TABLES CLOSE_ARRAY_OF_TABLES   // '[[ ']]'
 
-// uninon values
+
+%token KEY_EQ_VALUE     // '='
+%token KEY_TOKEN        // '.'
+%token SEPARATE_VALUES  // ','
+
+
+%token END // <<EOF>>
+
+
 %token <svalue> string key boolean date
 %token <svalue> integer
 %token <svalue> yyfloat
 
 %%
 
-S : SequencePairs '$';
+S : SequencePairs END;
 
 
 SequencePairs
     : Pair SequencePairs
+    | Table SequencePairs
+    | ArrayOfTables SequencePairs
     |
 ;
 
-//    | Table SequencePairs
-//    | ArrayOfTables SequencePairs
 
-//Table
-//    : 
-//;
+Table
+    : OPEN_TABLE Key CLOSE_TABLE
+;
 
 
-//ArrayOfTables
-//    :
-//;
+ArrayOfTables
+    : OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES
+;
 
 
 InLineTable
-    : {printf("{");} '{' InLinable '}' {printf("}\n");}
+    : {printf("{");} OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE {printf("}\n");}
 ;
 
 
 InLinable
     : Pair
-    | Pair ',' InLinable
+    | Pair SEPARATE_VALUES InLinable
 ;
 
 
 List
-    :  {printf("[");} '[' Listable ']' {printf("]\n");}
+    :  {printf("[");} OPEN_LIST Listable CLOSE_LIST {printf("]\n");}
 ;
 
 
 Listable
     : Value
-    | Value ',' Listable
-    | Value ',' {printf("vazio\n");}
+    | Value SEPARATE_VALUES Listable
+    | Value SEPARATE_VALUES {printf("vazio\n");}
 ;
 
 
 Pair
-    : Key '=' {printf(" = ");} Value
+    : Key KEY_EQ_VALUE {printf(" = ");} Value
 ;
 
 
 Key
     : DotedKey key {printf("%s",$2);}
-//    | DotedKey string {printf("%s",$2);}
 ;
 
 
 DotedKey
-    : Key '.' {printf(".");}
+    : Key KEY_TOKEN {printf(".");}
     | //passa uma hashtable
 ;
 

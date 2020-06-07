@@ -38,3 +38,7 @@ complex."booleans" = [true, false, ]
 
 [[a-table.inside.nestedArray]]
 
+
+ola = [1 , "a" , { lol = false }, 1_2_3 ]
+
+"lel" = 123.2

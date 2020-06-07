@@ -8,7 +8,6 @@ extern char *yytext;
 
 int yyerror();
 int erroSem(char*);
-
 %}
 
 %union{
@@ -19,10 +18,20 @@ int erroSem(char*);
 }
 
 
-%token OPEN_LIST            CLOSE_LIST              // '[' ']'
-%token OPEN_IN_LINE_TABLE   CLOSE_IN_LINE_TABLE     // '{' '}'
-%token OPEN_TABLE           CLOSE_TABLE             // '[' ']'
-%token OPEN_ARRAY_OF_TABLES CLOSE_ARRAY_OF_TABLES   // '[[ ']]'
+%token OPEN_LIST    // '['
+%token CLOSE_LIST   // ']'
+
+
+%token OPEN_IN_LINE_TABLE   // '{'
+%token CLOSE_IN_LINE_TABLE  // '}'
+
+
+%token OPEN_TABLE   // '['
+%token CLOSE_TABLE  // ']'
+
+
+%token OPEN_ARRAY_OF_TABLES     // '[['
+%token CLOSE_ARRAY_OF_TABLES    // ']]'
 
 
 %token KEY_EQ_VALUE     // '='
@@ -39,7 +48,7 @@ int erroSem(char*);
 
 %%
 
-S : SequencePairs END;
+S : SequencePairs END { return 0; }
 
 
 SequencePairs

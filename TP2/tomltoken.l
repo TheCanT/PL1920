@@ -8,10 +8,13 @@ dig [0-9]
 signal [\+\-]
 
 
+
 comment_regex #.*
 
 
+
 boolean_regex (true|false)
+
 
 
 key [A-Za-z0-9_\-]+
@@ -20,8 +23,10 @@ key_quotes \"[^"]*\"
 key_regex ({key}|{key_quotes})
 
 
+
 /* STRINGS POR ACABAR */
-string_regex \"[^"]*\"
+string_regex \"([^"]|\\\")*\"
+
 
 
 integer {dig}((_)?{dig})*
@@ -32,12 +37,14 @@ bin 0b[01]+
 integer_regex ({signal}?{integer}|{hex}|{oct}|{bin})
 
 
+
 fractional \.{integer}
 exponent [Ee]{signal}?{integer}
 inf {signal}?inf
 nan {signal}?nan
 
 float_regex ({signal}?{integer}{fractional}?{exponent}?|{inf}|{nan})
+
 
 
 offset {dig}{2}:{dig}{2}
@@ -50,10 +57,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 
 %s VALUE IN_LINE_TABLE LIST
-/*
-%token OPEN_TABLE CLOSE_TABLE
-%token OPEN_ARRAY_OF_TABLES CLOSE_ARRAY_OF_TABLES
-*/
+
 %%
 
 <VALUE>\n { yy_pop_state(); }
@@ -67,15 +71,15 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-<VALUE,LIST,IN_LINE_TABLE>\, {
-    if(YYSTATE == VALUE) yy_pop_state();
+<LIST,IN_LINE_TABLE>\, {
+    if(YYSTATE == VALUE) { yy_pop_state(); }
     return SEPARATE_VALUES; 
 }
 
 
-<VALUE,IN_LINE_TABLE>\} {
+<IN_LINE_TABLE>\} {
     yy_pop_state();
-    if(YYSTATE == VALUE) yy_pop_state();
+    if(YYSTATE == VALUE) { yy_pop_state(); }
     return CLOSE_IN_LINE_TABLE;
 }
 
@@ -88,19 +92,18 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 <LIST>\] {
     yy_pop_state();
-    if(YYSTATE == VALUE) yy_pop_state();
+    if(YYSTATE == VALUE) { yy_pop_state(); }
     return CLOSE_LIST;
 }
 
 
-<VALUE>\[ {
+<VALUE,LIST>\[ {
     yy_push_state(LIST);
     return OPEN_LIST;
 }
 
 
 \] {
-    puts("\nCLOSE_TABLE");
     return CLOSE_TABLE;
 }
 
@@ -111,7 +114,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 
 \]\] {
-    puts("\nCLOSE_ARRAY_OF_TABLES");
     return CLOSE_ARRAY_OF_TABLES;
 }
 
@@ -168,7 +170,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 
 {key_regex} {
-/* <INITIAL,IN_LINE_TABLE>{key_regex} */
     puts("\nKEY :");
     yylval.svalue = strdup(yytext);
     return key; 

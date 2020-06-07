@@ -48,7 +48,9 @@ int erroSem(char*);
 
 %%
 
-S : SequencePairs END { return 0; }
+S
+    : SequencePairs END { return 0; }
+;
 
 
 SequencePairs

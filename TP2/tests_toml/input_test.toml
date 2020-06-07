@@ -1,14 +1,29 @@
 # Pair with a inline table which contains lists
 "pair.one" = { fl0."at-s" = [
-        +1.0, 3.1415, -0.01,
-        5e+22, 1e06, -2E-2, 6.626e-34,
+        +1.0,
+        3.1415,
+        -0.01,
+        5e+22,
+        1e06,
+        -2E-2,
+        6.626e-34,
         224_617.445_991_228,
-        inf, +inf, -inf,
-        nan, +nan, -nan 
+        inf,
+        +inf,
+        -inf,
+        nan,
+        +nan,
+        -nan 
         ] , 1nt_s   = [
-        +99, 42, 0, -17,
-        1_000, 5_349_221, 1_2_3_4_5,
-        0xDEADBEEF, 0xdeadbeef,
+        +99,
+        42,
+        0,
+        -17,
+        1_000,
+        5_349_221,
+        1_2_3_4_5,
+        0xDEADBEEF,
+        0xdeadbeef,
         0o755,
         0b11010110,
         ] , "d4".t3s  = [

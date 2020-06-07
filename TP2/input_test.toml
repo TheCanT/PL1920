@@ -19,10 +19,13 @@
         1979-05-27T00:32:00.999999,
         1979-05-27,
         07:32:00,
-        00:32:00.999999 ] }
+        00:32:00.999999
+        ] , "random_string" = [ 
+        "its a string" 
+        ] }
 
 complex."booleans" = [true, false, ]
 
-complex."string#" = "this is a #string"
+complex."string#" = "thisisastring"
 
-#git commit -m "Switch toml example and the examples from toml lang github."
+#git commit -m "Fix the lex with tokens, so that we know the state we are in."

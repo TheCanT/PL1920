@@ -1,17 +1,18 @@
+%option 8bit noyywrap yylineno stack
+
 %{
 #include "y.tab.h"
-//%x VALUE PAIR
 %}
-
 
 dig [0-9]
 signal [\+\-]
 
 
-comment_regex #.*$
+comment_regex #.*
 
 
 boolean_regex (true|false)
+
 
 key [A-Za-z0-9_\-]+
 key_quotes \"[^"]*\"
@@ -47,45 +48,125 @@ offset_date_time {local_date_time}(Z|\-{offset})
 
 date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
-/* NAO ERA MÁ IDEIA USAR TOKENS PARA O pair = key value .... */
 
-/* ESTOU A TER UM ERRO QUE TEM HAVER COM key_regex PODE SOBRE PÔR POR float_regex 
-   TAMBEM COM date_regex  PROVAVELMENTE TAMBEM IRÀ DAR COM string_regex */
+%s VALUE IN_LINE_TABLE LIST
+
 %%
+
+<VALUE>\n { yy_pop_state(); }
+
+
 [ \t\n\r] ;
 
-[\.\,]    { return yytext[0]; }
 
-\} { return yytext[0]; }
+\. {
+    return yytext[0];
+}
 
-\{ { return yytext[0]; }
-   
-\] { return yytext[0]; }
 
-\[ { return yytext[0]; }
+<VALUE,LIST,IN_LINE_TABLE>\, {
+    if(YYSTATE == VALUE) yy_pop_state();
+    return yytext[0]; 
+}
 
-\= { return yytext[0]; }
 
-{boolean_regex}     { puts("\nBOOL :"); yylval.svalue = strdup(yytext); return boolean; }
+<VALUE,IN_LINE_TABLE>\} {
+    yy_pop_state();
+    if(YYSTATE == VALUE) yy_pop_state();
+    return yytext[0];
+}
 
-{integer_regex}     { puts("\nINT :"); yylval.svalue = strdup(yytext); return integer; }
 
-{float_regex}       { puts("\nFLOAT :"); yylval.svalue = strdup(yytext); return yyfloat; }
+<VALUE,LIST>\{ {
+    yy_push_state(IN_LINE_TABLE);
+    return yytext[0];
+}
 
-{date_regex}        { puts("\nDATE :"); yylval.svalue = strdup(yytext); return date; }
 
-{key_regex}         { puts("\nKEY :"); yylval.svalue = strdup(yytext); return key; }
+<LIST>\] {
+    yy_pop_state();
+    if(YYSTATE == VALUE) yy_pop_state();
+    return yytext[0];
+}
 
-{string_regex}      { puts("\nSTR :"); yylval.svalue = strdup(yytext); return string; }
+
+<VALUE>\[ {
+    yy_push_state(LIST);
+    return yytext[0];
+}
+
+
+\= {
+    yy_push_state(VALUE);
+    return yytext[0];
+}
+
+
+<VALUE,LIST>{boolean_regex} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    puts("\nBOOL :");
+    yylval.svalue = strdup(yytext);
+    return boolean;
+}
+
+
+<VALUE,LIST>{integer_regex} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    puts("\nINT :");
+    yylval.svalue = strdup(yytext);
+    return integer;
+}
+
+
+<VALUE,LIST>{float_regex} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    puts("\nFLOAT :");
+    yylval.svalue = strdup(yytext);
+    return yyfloat;
+}
+
+
+<VALUE,LIST>{date_regex} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    puts("\nDATE :");
+    yylval.svalue = strdup(yytext);
+    return date;
+}
+
+
+<VALUE,LIST>{string_regex} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    puts("\nSTR :");
+    yylval.svalue = strdup(yytext);
+    return string;
+}
+
+
+{key_regex} {
+/* <INITIAL,IN_LINE_TABLE>{key_regex} */
+    puts("\nKEY :");
+    yylval.svalue = strdup(yytext);
+    return key; 
+}
+
 
 {comment_regex} ;
 
-\$                  { return yytext[0]; }
 
-<<EOF>>             { puts("EOF"); return '$'; }
+\$ {
+   return yytext[0];
+}
 
-.                   { puts("LOL ERRO TOKENS"); return 0; }
+
+<<EOF>> {
+   puts("EOF");
+   return '$';
+}
+
+
+. {
+   puts("LOL ERRO TOKENS");
+   return 0;
+}
 
 %%
-
-//<<EOF>>             { return FIM; }

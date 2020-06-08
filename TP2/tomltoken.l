@@ -60,9 +60,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 %%
 
-<VALUE>\n { yy_pop_state(); }
-
-
 [ \t\n\r] ;
 
 
@@ -131,7 +128,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 <VALUE,LIST>{boolean_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    puts("\nBOOL :");
     yylval.svalue = strdup(yytext);
     return boolean;
 }
@@ -139,7 +135,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 <VALUE,LIST>{integer_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    puts("\nINT :");
     yylval.svalue = strdup(yytext);
     return integer;
 }
@@ -147,7 +142,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 <VALUE,LIST>{float_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    puts("\nFLOAT :");
     yylval.svalue = strdup(yytext);
     return yyfloat;
 }
@@ -155,7 +149,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 <VALUE,LIST>{date_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    puts("\nDATE :");
     yylval.svalue = strdup(yytext);
     return date;
 }
@@ -163,14 +156,12 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 <VALUE,LIST>{string_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    puts("\nSTR :");
     yylval.svalue = strdup(yytext);
     return string;
 }
 
 
 {key_regex} {
-    puts("\nKEY :");
     yylval.svalue = strdup(yytext);
     return key; 
 }

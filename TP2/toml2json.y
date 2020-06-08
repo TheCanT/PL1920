@@ -62,12 +62,12 @@ SequencePairs
 
 
 Table
-    : OPEN_TABLE Key CLOSE_TABLE
+    : {printf("[");} OPEN_TABLE Key CLOSE_TABLE {printf("]\n");}
 ;
 
 
 ArrayOfTables
-    : OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES
+    : {printf("[[");} OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES {printf("]]\n");}
 ;
 
 
@@ -89,8 +89,8 @@ List
 
 Listable
     : Value
-    | Value SEPARATE_VALUES Listable
-    | Value SEPARATE_VALUES {printf("vazio\n");}
+    | Value SEPARATE_VALUES {printf(" , ");} Listable
+    | Value SEPARATE_VALUES {printf(",\n");}
 ;
 
 

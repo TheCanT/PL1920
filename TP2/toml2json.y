@@ -49,30 +49,30 @@ int erroSem(char*);
 %%
 
 S
-    : SequencePairs END { return 0; }
+    : Sequence END { return 0; }
 ;
 
 
-SequencePairs
-    : Pair SequencePairs
-    | Table SequencePairs
-    | ArrayOfTables SequencePairs
+Sequence
+    : Pair Sequence
+    | Table Sequence
+    | ArrayOfTables Sequence
     |
 ;
 
 
 Table
-    : {printf("[");} OPEN_TABLE Key CLOSE_TABLE {printf("]\n");}
+    : OPEN_TABLE Key CLOSE_TABLE
 ;
 
 
 ArrayOfTables
-    : {printf("[[");} OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES {printf("]]\n");}
+    : OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES
 ;
 
 
 InLineTable
-    : {printf("{");} OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE {printf("}\n");}
+    : OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE
 ;
 
 
@@ -83,39 +83,39 @@ InLinable
 
 
 List
-    :  {printf("[");} OPEN_LIST Listable CLOSE_LIST {printf("]\n");}
+    : OPEN_LIST Listable CLOSE_LIST
 ;
 
 
 Listable
     : Value
-    | Value SEPARATE_VALUES {printf(" , ");} Listable
-    | Value SEPARATE_VALUES {printf(",\n");}
+    | Value SEPARATE_VALUES Listable
+    | Value SEPARATE_VALUES
 ;
 
 
 Pair
-    : Key KEY_EQ_VALUE {printf(" = ");} Value
+    : Key KEY_EQ_VALUE Value
 ;
 
 
 Key
-    : DotedKey key {printf("%s",$2);}
+    : DotedKey key
 ;
 
 
 DotedKey
-    : Key KEY_TOKEN {printf(".");}
-    | //passa uma hashtable
+    : Key KEY_TOKEN
+    |
 ;
 
 
 Value
-    : string    {printf("%s\n",$1);}
-    | yyfloat   {printf("%s\n",$1);}
-    | integer   {printf("%s\n",$1);}
-    | boolean   {printf("%s\n",$1);}
-    | date      {printf("%s\n",$1);}
+    : string
+    | yyfloat
+    | integer
+    | boolean
+    | date
     | List
     | InLineTable
 ;

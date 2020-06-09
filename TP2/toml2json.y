@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "storedata.h"
+
+STOREDATA global_table = NULL;
+STOREDATA table_in_use = NULL;
+
 extern int yylex();
 extern int yylineno;
 extern char *yytext;
@@ -15,6 +20,7 @@ int erroSem(char*);
     int    ivalue;
     char   cvalue;
     char * svalue;
+    struct storedata_st * store_data;
 }
 
 
@@ -42,14 +48,22 @@ int erroSem(char*);
 %token END // <<EOF>>
 
 
-%token <svalue> string key boolean date
-%token <svalue> integer
-%token <svalue> yyfloat
+%token <svalue> string key boolean date integer yyfloat
+
+%type <store_data> DotedKey Key
 
 %%
 
-S
-    : Sequence END { return 0; }
+S :
+    { 
+        global_table = store_data_new_table("global"); 
+        table_in_use = global_table; 
+    } 
+      Sequence END 
+    { 
+        print_2_JSON(global_table); 
+        return 0; 
+    }
 ;
 
 
@@ -62,12 +76,21 @@ Sequence
 
 
 Table
-    : OPEN_TABLE Key CLOSE_TABLE
+    : { table_in_use = global_table; } OPEN_TABLE Key CLOSE_TABLE {
+        store_data_set_data($3,g_hash_table_new(g_str_hash,g_str_equal));
+        store_data_set_type($3,'h');
+        table_in_use = $3;
+    }
 ;
 
 
 ArrayOfTables
-    : OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES
+    : { table_in_use = global_table; } OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES {
+        store_data_set_data($3,g_hash_table_new(g_str_hash,g_str_equal));
+        store_data_set_type($3,'h');
+        table_in_use = $3;
+        //this is not right
+    }
 ;
 
 
@@ -95,18 +118,18 @@ Listable
 
 
 Pair
-    : Key KEY_EQ_VALUE Value
+    : Key KEY_EQ_VALUE Value {  }
 ;
 
 
 Key
-    : DotedKey key
+    : DotedKey key { $$ = store_data_next_key_value($1,$2); }
 ;
 
 
 DotedKey
-    : Key KEY_TOKEN
-    |
+    : DotedKey key KEY_TOKEN { $$ = store_data_next_key($1,$2); }
+    |                        { $$ = table_in_use; }
 ;
 
 

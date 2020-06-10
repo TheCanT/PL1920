@@ -18,11 +18,17 @@ void store_data_set_data (STOREDATA sd, gpointer d) {
     if (sd) sd->data = d;
 }
 
+gpointer store_data_get_data (STOREDATA sd) {
+    if (sd) return sd->data;
+}
 
 void store_data_set_key (STOREDATA sd, char * k) {
     if (sd) sd->key = strdup(k);
 }
 
+char * store_data_get_key (STOREDATA sd) {
+    if (sd) return sd->key;
+}
 
 void store_data_set_type (STOREDATA sd, char t) {
     if (sd) sd->type = t;
@@ -147,7 +153,9 @@ int store_data_add_value (STOREDATA sd, STOREDATA v) {
 
 
         case 'v':
-            sd = v;
+            sd->data = v->data;
+            sd->type = v->type;
+            sd->key = v->key;
             break;
 
         default:
@@ -163,14 +171,19 @@ int store_data_add_value (STOREDATA sd, STOREDATA v) {
 
 void print_it (gpointer key, gpointer value, gpointer user_data) { 
     STOREDATA s = (STOREDATA) value;
+    int * i = (int *) user_data; 
+    (*i)--;
     if (s)
         if (s->type=='h'){
             printf("\"%s\" : {\n", (char *) key);
-            g_hash_table_foreach((GHashTable *) s->data, print_it, NULL);
-            puts("},");
+            int d = g_hash_table_size(s->data);
+            g_hash_table_foreach((GHashTable *) s->data, print_it, &d);
+            printf("}");
+            if ( *i > 0 ) puts(",");
         }
         else {
-            printf("\"%s\" : null,\n",(char *) key);
+            printf("\"%s\" : %s",(char *) key, (char *) s->data);
+            if ( *i > 0 ) puts(",");
         }
 }
 
@@ -178,7 +191,8 @@ void print_it (gpointer key, gpointer value, gpointer user_data) {
 void print_2_JSON (STOREDATA s) {
     if (s) {
         puts("{");
-        g_hash_table_foreach((GHashTable *) s->data, print_it, NULL);
+        int i = g_hash_table_size(s->data);
+        g_hash_table_foreach((GHashTable *) s->data, print_it, &i);
         puts("}");
     }
 }

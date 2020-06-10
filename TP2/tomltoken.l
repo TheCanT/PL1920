@@ -1,6 +1,7 @@
 %option 8bit noyywrap yylineno stack
 
 %{
+#include "storedata.h"
 #include "y.tab.h"
 %}
 
@@ -128,41 +129,41 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 <VALUE,LIST>{boolean_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    yylval.svalue = strdup(yytext);
+    yylval.string_value = strdup(yytext);
     return boolean;
 }
 
 
 <VALUE,LIST>{integer_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    yylval.svalue = strdup(yytext);
+    yylval.string_value = strdup(yytext);
     return integer;
 }
 
 
 <VALUE,LIST>{float_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    yylval.svalue = strdup(yytext);
+    yylval.string_value = strdup(yytext);
     return yyfloat;
 }
 
 
 <VALUE,LIST>{date_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    yylval.svalue = strdup(yytext);
+    yylval.string_value = strdup(yytext);
     return date;
 }
 
 
 <VALUE,LIST>{string_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
-    yylval.svalue = strdup(yytext);
+    yylval.string_value = strdup(yytext);
     return string;
 }
 
 
 {key_regex} {
-    yylval.svalue = strdup(yytext);
+    yylval.string_value = strdup(yytext);
     return key; 
 }
 

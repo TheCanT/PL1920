@@ -15,7 +15,11 @@ STOREDATA store_data_new (char t, char * k, gpointer d);
 
 void store_data_set_data (STOREDATA sd, gpointer d);
 
+gpointer store_data_get_data (STOREDATA sd);
+
 void store_data_set_key (STOREDATA sd, char * k);
+
+char * store_data_get_key (STOREDATA sd);
 
 void store_data_set_type (STOREDATA sd, char t);
 

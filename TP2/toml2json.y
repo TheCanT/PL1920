@@ -102,7 +102,12 @@ Table
 
 
 ArrayOfTables
-    : { table_in_use = global_table; parsing_ArrayOfTables = 0; } OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES {
+    : { 
+        table_in_use = global_table;
+        parsing_ArrayOfTables = 0;
+    } 
+    OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES
+    {
         if (store_data_get_type($3) == 'v') {
             store_data_set_data($3,g_ptr_array_new());
             store_data_set_type($3,'a');

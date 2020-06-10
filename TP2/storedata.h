@@ -11,6 +11,8 @@ typedef struct storedata_st * STOREDATA;
 
 STOREDATA store_data_new_table (char * k);
 
+STOREDATA store_data_new_array (char * k);
+
 STOREDATA store_data_new (char t, char * k, gpointer d);
 
 void store_data_set_data (STOREDATA sd, gpointer d);

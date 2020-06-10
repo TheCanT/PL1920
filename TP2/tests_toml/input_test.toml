@@ -1,5 +1,16 @@
+# VALID BUT DISCOURAGED
+
+apple.type = "fruit"
+orange.type = "fruit"
+
+apple.skin = "thin"
+orange.skin = "thick"
+
+apple.color = "red"
+orange.color = "orange"
+
 # Pair with a inline table which contains lists
-"pair.one" = { fl0."at-s" = [
+pair.one = { fl0.at-s = [
         +1.0,
         3.1415,
         -0.01,
@@ -13,8 +24,8 @@
         -inf,
         nan,
         +nan,
-        -nan 
-        ] , 1nt_s   = [
+        -nan,
+], 1nt_s = [
         +99,
         42,
         0,
@@ -26,7 +37,7 @@
         0xdeadbeef,
         0o755,
         0b11010110,
-        ] , "d4".t3s  = [
+], d4.t3s = [
         1979-05-27T07:32:00Z,
         1979-05-27T00:32:00-07:00,
         1979-05-27T00:32:00.999999-07:00,
@@ -34,26 +45,25 @@
         1979-05-27T00:32:00.999999,
         1979-05-27,
         07:32:00,
-        00:32:00.999999
-        ] , "random_string" = [ 
-        "its a string" 
-        ] }
+        00:32:00.999999,
+], random_string = [ "its a string" ] }
 
-complex."booleans" = [true, false, ]
+complex.booleans = [ true, false ]
 
-"complex.string#" = "thisisastring"
+complex.t = "thisisastring"
 
 #git commit -m "Fix the lex with tokens, so that we know the state we are in."
 
 [a-table]
 
-[a-table.inside]
-
-[[a-table.inside.nestedArray]]
-
-[[a-table.inside.nestedArray]]
-
-
-ola = [1 , "a" , { lol = false }, 1_2_3 ]
-
 "lel" = 123.2
+
+        [a-table.inside]
+
+        #[[a-table.inside.nestedArray]]
+
+        #[[a-table.inside.nestedArray]]
+
+        primeiro = { segundo.l = "false", segundo.bonk.l = [ 1, "'a'", [ 98, 1 ] ] }
+
+        cool.abc = [[ 1, 1.2, [ "ola", "adeus" ]], "asd", 3 ]

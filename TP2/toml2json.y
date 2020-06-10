@@ -6,6 +6,7 @@
 
 STOREDATA global_table = NULL;
 STOREDATA table_in_use = NULL;
+STOREDATA in_line_table = NULL;
 
 int parsing = 0;
 
@@ -72,9 +73,9 @@ S :
 
 
 Sequence
-    : Pair Sequence
-    | Table Sequence
-    | ArrayOfTables Sequence
+    : Sequence Pair
+    | Sequence Table
+    | Sequence ArrayOfTables
     |
 ;
 
@@ -99,25 +100,37 @@ ArrayOfTables
 
 
 InLineTable
-    : OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE { asprintf(&$$,"{ %s }",$2); }
+    : OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE { $$ = $2; parsing--; }
 ;
 
 
 InLinable
-    : Pair                           { $$ = $1; }
-    | Pair SEPARATE_VALUES InLinable { asprintf(&$$,"%s, %s",$1,$3); }
+    : {
+        parsing++;
+        in_line_table = store_data_new_table("inlinable");
+    } 
+    Pair 
+    { 
+        STOREDATA s = in_line_table; 
+        $$ = s; 
+    }
+    | InLinable SEPARATE_VALUES Pair { $$ = $1; }
 ;
 
 
 List
-    : OPEN_LIST Listable CLOSE_LIST { asprintf(&$$,"[ %s ]",$2); }
+    : OPEN_LIST Listable CLOSE_LIST { $$ = $2; }
 ;
 
 
 Listable
-    : Value                          { $$ = store_data_get_key($1); }
-    | Value SEPARATE_VALUES Listable { asprintf(&$$,"%s, %s",store_data_get_key($1),$3); }
-    | Value SEPARATE_VALUES          { $$ = store_data_get_key($1); }
+    : Value { 
+        STOREDATA s = store_data_new_array("listable"); 
+        store_data_add_value(s,$1);
+        $$ = s;
+    }
+    | Listable SEPARATE_VALUES Value { store_data_add_value($1,$3); $$ = $1; }
+    | Listable SEPARATE_VALUES       { $$ = $1; }
 ;
 
 
@@ -125,7 +138,7 @@ Pair
     : Key KEY_EQ_VALUE Value {
         store_data_set_key($3,store_data_get_key($1));
         store_data_add_value($1,$3);
-        asprintf(&$$,"\"%s\" : %s",store_data_get_key($1),store_data_get_data($1)); 
+        $$ = $1;
     }
 ;
 
@@ -134,21 +147,22 @@ Key
     : DotedKey key { $$ = store_data_next_key_value($1,$2); }
 ;
 
-//arranjar uma forma das in line tables usarem a table atual da Key.
+
 DotedKey
     : DotedKey key KEY_TOKEN { $$ = store_data_next_key($1,$2); }
-    |                        { $$ = table_in_use; }
+    | { if (parsing > 0) $$ = in_line_table;
+        else             $$ = table_in_use; }
 ;
 
-//types not right and using keys just to teste some...
+
 Value
-    : string        { $$ = store_data_new ('s', $1, $1); }
-    | yyfloat       { $$ = store_data_new ('s', $1, $1); }
-    | integer       { $$ = store_data_new ('s', $1, $1); }
-    | boolean       { $$ = store_data_new ('s', $1, $1); }
-    | date          { char * s; asprintf(&s,"\"%s\"",$1); $$ = store_data_new ('s', s, s); }
-    | List          { $$ = store_data_new ('s', $1, $1); }
-    | InLineTable   { $$ = store_data_new ('s', $1, $1); }
+    : string        { $$ = store_data_new ('s', "", $1); }
+    | yyfloat       { $$ = store_data_new ('s', "", $1); }
+    | integer       { $$ = store_data_new ('s', "", $1); }
+    | boolean       { $$ = store_data_new ('s', "", $1); }
+    | date          { char * s; asprintf(&s,"\"%s\"",$1); $$ = store_data_new ('s', "", s); }
+    | List          { $$ = $1; }
+    | InLineTable   { $$ = $1; }
 ;
 
 %%

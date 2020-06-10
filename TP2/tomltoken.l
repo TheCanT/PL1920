@@ -101,26 +101,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-\] {
-    return CLOSE_TABLE;
-}
-
-
-\[ {
-    return OPEN_TABLE;
-}
-
-
-\]\] {
-    return CLOSE_ARRAY_OF_TABLES;
-}
-
-
-\[\[ {
-    return OPEN_ARRAY_OF_TABLES;
-}
-
-
 \= {
     yy_push_state(VALUE);
     return KEY_EQ_VALUE;
@@ -159,6 +139,26 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
     if(YYSTATE == VALUE) yy_pop_state();
     yylval.string_value = strdup(yytext);
     return string;
+}
+
+
+\] {
+    return CLOSE_TABLE;
+}
+
+
+\[ {
+    return OPEN_TABLE;
+}
+
+
+<INITIAL>\]\] {
+    return CLOSE_ARRAY_OF_TABLES;
+}
+
+
+<INITIAL>\[\[ {
+    return OPEN_ARRAY_OF_TABLES;
 }
 
 

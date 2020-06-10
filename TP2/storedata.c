@@ -46,6 +46,18 @@ STOREDATA store_data_new_table (char * k) {
 }
 
 
+STOREDATA store_data_new_array (char * k) {
+    STOREDATA r = malloc(sizeof(struct storedata_st));
+
+    r->type = 'a';
+    r->key = strdup(k);
+    r->data =  g_ptr_array_new ();
+
+    return r;
+}
+
+
+
 STOREDATA store_data_new (char t, char * k, gpointer d) {
     STOREDATA r = malloc(sizeof(struct storedata_st));
 
@@ -169,6 +181,21 @@ int store_data_add_value (STOREDATA sd, STOREDATA v) {
 
 //\ - prints - \//
 
+
+void print_it (gpointer key, gpointer value, gpointer user_data);
+
+void print_a (gpointer data, gpointer user_data) {
+    STOREDATA s = (STOREDATA) data;
+    print_it(s->key,s,user_data);
+}
+
+void ptr_array_get_size (gpointer data, gpointer user_data) {
+    int * r = (int *) user_data;
+    (*r)++;
+}
+
+int print_list = 0;
+
 void print_it (gpointer key, gpointer value, gpointer user_data) { 
     STOREDATA s = (STOREDATA) value;
     int * i = (int *) user_data; 
@@ -176,13 +203,34 @@ void print_it (gpointer key, gpointer value, gpointer user_data) {
     if (s)
         if (s->type=='h'){
             printf("\"%s\" : {\n", (char *) key);
+
             int d = g_hash_table_size(s->data);
             g_hash_table_foreach((GHashTable *) s->data, print_it, &d);
+
             printf("}");
             if ( *i > 0 ) puts(",");
         }
-        else {
-            printf("\"%s\" : %s",(char *) key, (char *) s->data);
+        else
+        if (s->type=='a'){
+            if (!print_list) printf("\"%s\" : [\n", (char *) key);
+            else printf("[\n");
+
+            int r = 0;
+            print_list++;
+
+            g_ptr_array_foreach((GPtrArray *)s->data, ptr_array_get_size, &r);
+            g_ptr_array_foreach((GPtrArray *)s->data, print_a, &r);
+
+            printf("]");
+            print_list--;
+
+            if ( *i > 0 ) puts(",");
+        }
+        else
+        if (s->type=='s') {
+            if (print_list) printf("%s",(char *) s->data);
+            else printf("\"%s\" : %s",(char *) key, (char *) s->data);
+
             if ( *i > 0 ) puts(",");
         }
 }

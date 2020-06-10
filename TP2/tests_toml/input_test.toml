@@ -60,10 +60,17 @@ complex.t = "thisisastring"
 
         [a-table.inside]
 
-        #[[a-table.inside.nestedArray]]
-
-        #[[a-table.inside.nestedArray]]
-
-        primeiro = { segundo.l = "false", segundo.bonk.l = [ 1, "'a'", [ 98, 1 ] ] }
-
+        [[a-table.inside.nestedArray]]
         cool.abc = [[ 1, 1.2, [ "ola", "adeus" ]], "asd", 3 ]
+        cool.loco = 1e2
+
+        [[a-table.inside.nestedArray]]
+        primeiro = { segundo.l = "false", segundo.bonk.l = [ 1, "'a'", [ 98, 1 ] ] }
+        cool.loco = 1e2
+
+[[list]]
+ip = "123"
+
+[[list]]
+ip = "456"
+ip2 = "789"

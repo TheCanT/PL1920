@@ -25,6 +25,8 @@ char * store_data_get_key (STOREDATA sd);
 
 void store_data_set_type (STOREDATA sd, char t);
 
+char store_data_get_type (STOREDATA sd);
+
 STOREDATA store_data_next_key (STOREDATA sd, char * next_key);
 
 STOREDATA store_data_next_key_value (STOREDATA sd, char * next_key);

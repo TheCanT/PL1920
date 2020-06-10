@@ -4,11 +4,13 @@
 
 #include "storedata.h"
 
-STOREDATA global_table = NULL;
-STOREDATA table_in_use = NULL;
-STOREDATA in_line_table = NULL;
+STOREDATA global_table    = NULL;
+STOREDATA table_in_use    = NULL;
+STOREDATA in_line_table   = NULL;
+STOREDATA array_of_tables = NULL;
 
-int parsing = 0;
+int parsing_InLineTable   = 0;
+int parsing_ArrayOfTables = 0;
 
 extern void asprintf();
 extern int yylex();
@@ -65,8 +67,8 @@ S :
         table_in_use = global_table; 
     } 
       Sequence END 
-    { 
-        print_2_JSON(global_table); 
+    {
+        print_2_JSON(global_table);
         return 0; 
     }
 ;
@@ -81,7 +83,17 @@ Sequence
 
 
 Table
-    : { table_in_use = global_table; } OPEN_TABLE Key CLOSE_TABLE {
+    : { 
+        if (parsing_ArrayOfTables < 1) {
+            table_in_use = global_table;
+        } 
+        else {
+            table_in_use = array_of_tables;
+            parsing_ArrayOfTables = 0;
+        }
+    }
+    OPEN_TABLE Key CLOSE_TABLE 
+    {
         store_data_set_data($3,g_hash_table_new(g_str_hash,g_str_equal));
         store_data_set_type($3,'h');
         table_in_use = $3;
@@ -90,23 +102,27 @@ Table
 
 
 ArrayOfTables
-    : { table_in_use = global_table; } OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES {
-        store_data_set_data($3,g_hash_table_new(g_str_hash,g_str_equal));
-        store_data_set_type($3,'h');
-        //this is not right
-        table_in_use = $3;
+    : { table_in_use = global_table; parsing_ArrayOfTables = 0; } OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES {
+        if (store_data_get_type($3) == 'v') {
+            store_data_set_data($3,g_ptr_array_new());
+            store_data_set_type($3,'a');
+        }
+        STOREDATA s = store_data_new_table("table");
+        store_data_add_value($3,s);
+        array_of_tables = s;
+        parsing_ArrayOfTables++;
     }
 ;
 
 
 InLineTable
-    : OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE { $$ = $2; parsing--; }
+    : OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE { $$ = $2; parsing_InLineTable--; }
 ;
 
 
 InLinable
     : {
-        parsing++;
+        parsing_InLineTable++;
         in_line_table = store_data_new_table("inlinable");
     } 
     Pair 
@@ -150,8 +166,11 @@ Key
 
 DotedKey
     : DotedKey key KEY_TOKEN { $$ = store_data_next_key($1,$2); }
-    | { if (parsing > 0) $$ = in_line_table;
-        else             $$ = table_in_use; }
+    | { 
+        $$ = table_in_use;
+        if (parsing_ArrayOfTables > 0) $$ = array_of_tables;
+        if (parsing_InLineTable   > 0) $$ = in_line_table;
+    }
 ;
 
 

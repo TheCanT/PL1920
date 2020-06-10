@@ -34,13 +34,17 @@ void store_data_set_type (STOREDATA sd, char t) {
     if (sd) sd->type = t;
 }
 
+char store_data_get_type (STOREDATA sd) {
+    if (sd) return sd->type;
+}
+
 
 STOREDATA store_data_new_table (char * k) {
     STOREDATA r = malloc(sizeof(struct storedata_st));
 
     r->type = 'h';
+    r->data = g_hash_table_new(g_str_hash,g_str_equal);
     r->key = strdup(k);
-    r->data =  g_hash_table_new(g_str_hash,g_str_equal);
 
     return r;
 }
@@ -51,7 +55,7 @@ STOREDATA store_data_new_array (char * k) {
 
     r->type = 'a';
     r->key = strdup(k);
-    r->data =  g_ptr_array_new ();
+    r->data = g_ptr_array_new();
 
     return r;
 }
@@ -202,17 +206,19 @@ void print_it (gpointer key, gpointer value, gpointer user_data) {
     (*i)--;
     if (s)
         if (s->type=='h'){
-            printf("\"%s\" : {\n", (char *) key);
+            if (!strcmp("table",(char *) key)) { printf("{\n");}
+            else printf("\"%s\" : {\n", (char *) key);
 
             int d = g_hash_table_size(s->data);
             g_hash_table_foreach((GHashTable *) s->data, print_it, &d);
+
 
             printf("}");
             if ( *i > 0 ) puts(",");
         }
         else
         if (s->type=='a'){
-            if (!print_list) printf("\"%s\" : [\n", (char *) key);
+            if (!print_list || strcmp("listable",(char *) key)) printf("\"%s\" : [\n", (char *) key);
             else printf("[\n");
 
             int r = 0;
@@ -228,7 +234,7 @@ void print_it (gpointer key, gpointer value, gpointer user_data) {
         }
         else
         if (s->type=='s') {
-            if (print_list) printf("%s",(char *) s->data);
+            if (print_list && !strcmp("",(char *) key)) printf("%s",(char *) s->data);
             else printf("\"%s\" : %s",(char *) key, (char *) s->data);
 
             if ( *i > 0 ) puts(",");

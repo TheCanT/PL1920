@@ -11,6 +11,7 @@ STOREDATA array_of_tables = NULL;
 
 int parsing_InLineTable   = 0;
 int parsing_ArrayOfTables = 0;
+int parsing_Table         = 0;
 
 extern void asprintf();
 extern int yylex();
@@ -84,19 +85,22 @@ Sequence
 
 Table
     : { 
-        if (parsing_ArrayOfTables < 1) {
-            table_in_use = global_table;
-        } 
-        else {
-            table_in_use = array_of_tables;
-            parsing_ArrayOfTables = 0;
-        }
+        table_in_use = global_table;
+        parsing_Table = 1;
+        parsing_ArrayOfTables=0;
     }
     OPEN_TABLE Key CLOSE_TABLE 
     {
-        store_data_set_data($3,g_hash_table_new(g_str_hash,g_str_equal));
-        store_data_set_type($3,'h');
-        table_in_use = $3;
+        if (parsing_ArrayOfTables > 0) {
+            array_of_tables = $3;
+        }
+        else {
+            table_in_use = $3;
+            store_data_set_data($3,g_hash_table_new(g_str_hash,g_str_equal));
+            store_data_set_type($3,'h');
+        }
+
+        parsing_Table = 0;
     }
 ;
 
@@ -173,8 +177,8 @@ DotedKey
     : DotedKey key KEY_TOKEN { $$ = store_data_next_key($1,$2); }
     | { 
         $$ = table_in_use;
-        if (parsing_ArrayOfTables > 0) $$ = array_of_tables;
-        if (parsing_InLineTable   > 0) $$ = in_line_table;
+        if (parsing_ArrayOfTables > 0 && !parsing_Table) $$ = array_of_tables;
+        if (parsing_InLineTable   > 0 && !parsing_Table) $$ = in_line_table;
     }
 ;
 

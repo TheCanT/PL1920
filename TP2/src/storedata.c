@@ -14,6 +14,9 @@ struct storedata_st {
 
 
 
+void ptr_array_get_size (gpointer data, gpointer user_data);
+
+
 void store_data_set_data (STOREDATA sd, gpointer d) {
     if (sd) sd->data = d;
 }
@@ -78,6 +81,7 @@ STOREDATA store_data_next_key (STOREDATA sd, char * next_key) {
 
     STOREDATA next;
     GHashTable * hTable;
+    GPtrArray * pArray;
     
     switch (sd->type) {
         case 'h':
@@ -92,6 +96,12 @@ STOREDATA store_data_next_key (STOREDATA sd, char * next_key) {
 
             break;
 
+        case 'a':
+            pArray = (GPtrArray *) sd->data;
+            int i = 0;
+            g_ptr_array_foreach(pArray, ptr_array_get_size, &i);
+            next = g_ptr_array_index(pArray,i-1);
+            break;
 
         default:
             return NULL;
@@ -106,6 +116,7 @@ STOREDATA store_data_next_key_value (STOREDATA sd, char * next_key) {
 
     STOREDATA next;
     GHashTable * hTable;
+    GPtrArray * pArray;
     
     switch (sd->type) {
         case 'h':
@@ -117,6 +128,22 @@ STOREDATA store_data_next_key_value (STOREDATA sd, char * next_key) {
                 g_hash_table_insert(hTable, next->key, next);
 
             }
+
+            break;
+
+
+        case 'a':
+            pArray = (GPtrArray *) sd->data;
+            STOREDATA s;
+            
+            int i = 0;
+            g_ptr_array_foreach(pArray, ptr_array_get_size, &i);
+            s = g_ptr_array_index(pArray,i-1);
+
+            next = store_data_next_key_value(s,next_key);
+
+            store_data_set_data(next,g_hash_table_new(g_str_hash,g_str_equal));
+            store_data_set_type(next,'h');
 
             break;
 

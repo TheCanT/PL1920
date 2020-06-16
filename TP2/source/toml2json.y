@@ -109,17 +109,21 @@ ArrayOfTables
     : { 
         table_in_use = global_table;
         parsing_ArrayOfTables = 0;
+        parsing_Table = 1;
     } 
     OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES
     {
-        if (store_data_get_type($3) == 'v') {
+        if (store_data_get_type($3) != 'a') {
             store_data_set_data($3,g_ptr_array_new());
             store_data_set_type($3,'a');
         }
+        
         STOREDATA s = store_data_new_table("table");
         store_data_add_value($3,s);
+
+        table_in_use = s;
         array_of_tables = s;
-        parsing_ArrayOfTables++;
+        parsing_Table = 0;
     }
 ;
 

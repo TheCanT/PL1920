@@ -142,8 +142,10 @@ STOREDATA store_data_next_key_value (STOREDATA sd, char * next_key) {
 
             next = store_data_next_key_value(s,next_key);
 
-            store_data_set_data(next,g_hash_table_new(g_str_hash,g_str_equal));
-            store_data_set_type(next,'h');
+            if (store_data_get_type(next) == 'v') {
+                store_data_set_data(next,g_hash_table_new(g_str_hash,g_str_equal));
+                store_data_set_type(next,'h');
+            }
 
             break;
 

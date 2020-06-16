@@ -24,9 +24,10 @@ key_quotes \"[^"]*\"
 key_regex ({key}|{key_quotes})
 
 
-
+apostrophe \'([^']|\\\')*\'
+quotes \"([^"]|\\\")*\"
 /* STRINGS POR ACABAR */
-string_regex \"([^"]|\\\")*\"
+string_regex ({apostrophe}|{quotes})
 
 
 
@@ -60,6 +61,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 %s VALUE IN_LINE_TABLE LIST
 
 %%
+<VALUE>\n { yy_pop_state(); }
 
 [ \t\n\r] ;
 

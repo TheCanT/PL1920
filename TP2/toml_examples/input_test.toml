@@ -83,3 +83,25 @@ ip = "123"
 
 [[list]]
 ip = "456"
+
+
+# You can create nested arrays of tables as well.
+
+[[fruit]]
+  name = "apple"
+
+  [fruit.physical]
+    color = "red"
+    shape = "round"
+
+  [[fruit.variety]]
+    name = "red delicious"
+    outrou = "valor"
+
+  [[fruit.variety]]
+    name = "granny smith"
+
+[[fruit]]
+  name = "banana"
+  [[fruit.variety]]
+    name = "plantain"

@@ -144,12 +144,12 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-\] {
+<INITIAL>\] {
     return CLOSE_TABLE;
 }
 
 
-\[ {
+<INITIAL>\[ {
     return OPEN_TABLE;
 }
 

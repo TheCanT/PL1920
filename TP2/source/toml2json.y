@@ -18,6 +18,8 @@ extern int yylex();
 extern int yylineno;
 extern char *yytext;
 
+
+char * take_of_under_score (char * s);
 int yyerror();
 int erroSem(char*);
 %}
@@ -53,11 +55,21 @@ int erroSem(char*);
 %token END // <<EOF>>
 
 
-%token <string_value> string key boolean date integer yyfloat
+%token <string_value> boolean date
+
+%token <string_value> integer yyfloat special_numeric
+
+%token <string_value> quote_string apostrophe_string
+%token <string_value> quote_tri_string apostrophe_tri_string
+
+%token <string_value> string_key quote_key apostrophe_key
+
 
 %type  <pointer> Value Listable List InLinable InLineTable Pair
 
 %type <store_data> DotedKey Key
+
+%type <string_value> String KeyString Numeric
 
 
 %%
@@ -173,12 +185,12 @@ Pair
 
 
 Key
-    : DotedKey key { $$ = store_data_next_key_value($1,$2); }
+    : DotedKey KeyString { $$ = store_data_next_key_value($1,$2); }
 ;
 
 
 DotedKey
-    : DotedKey key KEY_TOKEN { $$ = store_data_next_key($1,$2); }
+    : DotedKey KeyString KEY_TOKEN { $$ = store_data_next_key($1,$2); }
     | { 
         $$ = table_in_use;
         if (parsing_ArrayOfTables > 0 && !parsing_Table) $$ = array_of_tables;
@@ -187,14 +199,35 @@ DotedKey
 ;
 
 
+KeyString
+    : string_key        { asprintf(&$$,"%s",$1); }
+    | quote_key         { char * s = $1+1; s[strlen(s)-1] = '\0'; asprintf(&$$,"%s",s); }
+    | apostrophe_key    { char * s = $1+1; s[strlen(s)-1] = '\0'; asprintf(&$$,"%s",s); }
+;
+
+
 Value
-    : string        { $$ = store_data_new ('s', "", $1); }
-    | yyfloat       { $$ = store_data_new ('s', "", $1); }
-    | integer       { $$ = store_data_new ('s', "", $1); }
+    : String        { $$ = store_data_new ('s', "", $1); }
+    | Numeric       { $$ = store_data_new ('s', "", $1); }
     | boolean       { $$ = store_data_new ('s', "", $1); }
     | date          { char * s; asprintf(&s,"\"%s\"",$1); $$ = store_data_new ('s', "", s); }
     | List          { $$ = $1; }
     | InLineTable   { $$ = $1; }
+;
+
+
+String
+    : quote_string          { asprintf(&$$,"%s",$1); }
+    | apostrophe_string     { char * s = $1+1; s[strlen(s)-1] = '\0'; asprintf(&$$,"\"%s\"",s); }
+    | quote_tri_string      { asprintf(&$$,"%s",$1); }
+    | apostrophe_tri_string { asprintf(&$$,"%s",$1); }
+;
+
+
+Numeric
+    : yyfloat           { $$ = take_of_under_score (*$1 == '+'  ? $1 + 1 : $1); }
+    | integer           { $$ = take_of_under_score (*$1 == '+'  ? $1 + 1 : $1); }
+    | special_numeric   { asprintf(&$$,"\"%s\"",$1); }
 ;
 
 %%
@@ -212,4 +245,17 @@ int erroSem(char *s){
 int yyerror(){
     printf("Erro Sintático ou Léxico na linha: %d, com o texto: %s\n", yylineno, yytext);
     return 0;
+}
+
+char * take_of_under_score (char * s) {
+    char * r = malloc(strlen(s));
+    int i = 0, j = 0;
+    
+    while (s[i]) {
+        if (s[i] != '_') r[j++] = s[i]; 
+        i++;
+    }
+    r[j] = '\0';
+    
+    return r; 
 }

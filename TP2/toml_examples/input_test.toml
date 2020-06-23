@@ -10,7 +10,7 @@ apple.color = "red"
 orange.color = "orange"
 
 # Pair with a inline table which contains lists
-pair.one = { fl0.at-s = [
+pair.one = { "fl0.at-s" = [
         +1.0,
         3.1415,
         -0.01,
@@ -37,7 +37,7 @@ pair.one = { fl0.at-s = [
         0xdeadbeef,
         0o755,
         0b11010110,
-], d4.t3s = [
+], "d4.t3s" = [
         1979-05-27T07:32:00Z,
         1979-05-27T00:32:00-07:00,
         1979-05-27T00:32:00.999999-07:00,
@@ -96,7 +96,6 @@ ip = "456"
 
   [[fruit.variety]]
     name = "red delicious"
-    outrou = "valor"
 
   [[fruit.variety]]
     name = "granny smith"

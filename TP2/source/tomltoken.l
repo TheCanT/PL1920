@@ -18,16 +18,19 @@ boolean_regex (true|false)
 
 
 
-key [A-Za-z0-9_\-]+
-key_quotes \"[^"]*\"
+string_key [A-Za-z0-9_\-]+
+quote_key \"([^"]|\\\")*\"
+apostrophe_key \'([^']|\\\')*\'
 
-key_regex ({key}|{key_quotes})
+/* key_regex ({key}|{key_quotes}) */
 
 
-apostrophe \'([^']|\\\')*\'
-quotes \"([^"]|\\\")*\"
-/* STRINGS POR ACABAR */
-string_regex ({apostrophe}|{quotes})
+quote_string \"([^"]|\\\")*\"
+apostrophe_string \'([^']|\\\')*\'
+quote_tri_string \'\'\'
+apostrophe_tri_string \"\"\"
+
+/* string_regex ({apostrophe_string}|{quote_string}) */
 
 
 
@@ -45,7 +48,7 @@ exponent [Ee]{signal}?{integer}
 inf {signal}?inf
 nan {signal}?nan
 
-float_regex ({signal}?{integer}{fractional}?{exponent}?|{inf}|{nan})
+float_regex ({signal}?{integer}{fractional}?{exponent}?)
 
 
 
@@ -130,6 +133,13 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
+<VALUE,LIST>({inf}|{nan}) {
+    if(YYSTATE == VALUE) yy_pop_state();
+    yylval.string_value = strdup(yytext);
+    return special_numeric;
+}
+
+
 <VALUE,LIST>{date_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
     yylval.string_value = strdup(yytext);
@@ -137,10 +147,31 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-<VALUE,LIST>{string_regex} {
+<VALUE,LIST>{apostrophe_string} {
     if(YYSTATE == VALUE) yy_pop_state();
     yylval.string_value = strdup(yytext);
-    return string;
+    return apostrophe_string;
+}
+
+
+<VALUE,LIST>{quote_string} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    yylval.string_value = strdup(yytext);
+    return quote_string;
+}
+
+
+<VALUE,LIST>{apostrophe_tri_string} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    yylval.string_value = strdup(yytext);
+    return apostrophe_tri_string;
+}
+
+
+<VALUE,LIST>{quote_tri_string} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    yylval.string_value = strdup(yytext);
+    return quote_tri_string;
 }
 
 
@@ -164,9 +195,19 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-{key_regex} {
+{string_key} {
     yylval.string_value = strdup(yytext);
-    return key; 
+    return string_key;
+}
+
+{quote_key} {
+    yylval.string_value = strdup(yytext);
+    return quote_key;
+}
+
+{apostrophe_key} {
+    yylval.string_value = strdup(yytext);
+    return apostrophe_key;
 }
 
 

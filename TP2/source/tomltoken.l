@@ -24,17 +24,12 @@ apostrophe_key \'[^']*\'
 
 
 
-quote_string \"([^"]|\\\")*\"
-apostrophe_string \'[^']*\'
-
-
-
 integer {dig}((_)?{dig})*
 hex 0x[0-9A-Fa-f]+
 oct 0o[0-7]+
 bin 0b[01]+
 
-integer_regex ({signal}?{integer}|{hex}|{oct}|{bin})
+integer_regex {signal}?{integer}
 
 
 
@@ -221,6 +216,27 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
+<VALUE,LIST>{hex} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    yylval.string_value = strdup(yytext);
+    return hex_numeric;
+}
+
+
+<VALUE,LIST>{oct} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    yylval.string_value = strdup(yytext);
+    return oct_numeric;
+}
+
+
+<VALUE,LIST>{bin} {
+    if(YYSTATE == VALUE) yy_pop_state();
+    yylval.string_value = strdup(yytext);
+    return bin_numeric;
+}
+
+
 <VALUE,LIST>{float_regex} {
     if(YYSTATE == VALUE) yy_pop_state();
     yylval.string_value = strdup(yytext);
@@ -231,7 +247,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 <VALUE,LIST>({inf}|{nan}) {
     if(YYSTATE == VALUE) yy_pop_state();
     yylval.string_value = strdup(yytext);
-    return special_numeric;
+    return undifined_numeric;
 }
 
 

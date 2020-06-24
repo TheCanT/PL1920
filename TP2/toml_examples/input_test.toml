@@ -72,7 +72,7 @@ segundo.bonk.l = [ 1, "'a'", [ 98, 1 ] ]
 
 [[a-table.inside.nestedArray]]
 cool.loco = 1e2
-primeiro = { segundo.l = "false", segundo.bonk.l = [ 1, "'a'", [ 98, 1 ] ] }
+primeiro = { segundo.l = { bool ="false"}, segundo.bonk.l = [ 1, "'a'", [ 98, 1 ] ] }
 
 
 [k.a.  a]

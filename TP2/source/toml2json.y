@@ -9,6 +9,8 @@ STOREDATA table_in_use    = NULL;
 STOREDATA in_line_table   = NULL;
 STOREDATA array_of_tables = NULL;
 
+GPtrArray * inline_stack  = NULL;
+
 int parsing_InLineTable   = 0;
 int parsing_ArrayOfTables = 0;
 int parsing_Table         = 0;
@@ -78,6 +80,7 @@ S :
     { 
         global_table = store_data_new_table("global"); 
         table_in_use = global_table; 
+        inline_stack = g_ptr_array_new();
     } 
       Sequence END 
     {
@@ -141,19 +144,23 @@ ArrayOfTables
 
 
 InLineTable
-    : OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE { $$ = $2; parsing_InLineTable--; }
+    : OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE { 
+        $$ = $2;
+        parsing_InLineTable--;
+        if (parsing_InLineTable > 0) in_line_table = g_ptr_array_index(inline_stack,parsing_InLineTable-1);
+    }
 ;
 
 
 InLinable
     : {
-        parsing_InLineTable++;
         in_line_table = store_data_new_table("inlinable");
+        g_ptr_array_insert(inline_stack, parsing_InLineTable, in_line_table); 
+        parsing_InLineTable++;
     } 
     Pair 
     { 
-        STOREDATA s = in_line_table; 
-        $$ = s; 
+        $$ = g_ptr_array_index(inline_stack,parsing_InLineTable-1); 
     }
     | InLinable SEPARATE_VALUES Pair { $$ = $1; }
 ;

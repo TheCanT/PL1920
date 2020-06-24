@@ -54,25 +54,58 @@ int erroSem(char*);
 %token SEPARATE_VALUES  // ','
 
 
+%token APOSTROPHE_TRI_OPEN  // '''
+%token APOSTROPHE_TRI_CLOSE // '''
+
+
+%token QUOTE_TRI_OPEN   // """
+%token QUOTE_TRI_CLOSE  // """
+
+
+%token APOSTROPHE_OPEN  // '
+%token APOSTROPHE_CLOSE // '
+
+
+%token QUOTE_OPEN   // "
+%token QUOTE_CLOSE  // "
+
+
 %token END // <<EOF>>
 
 
-%token <string_value> boolean date
+%token <string_value>
+    boolean
+    date
+    apostrophe_char
+    quote_char
+    integer
+    yyfloat
+    special_numeric
+    string_key
+    quote_key
+    apostrophe_key
 
-%token <string_value> integer yyfloat special_numeric
 
-%token <string_value> quote_string apostrophe_string
-%token <string_value> quote_tri_string apostrophe_tri_string
+%type <pointer>
+    Value
+    Listable
+    List
+    InLinable
+    InLineTable
+    Pair
 
-%token <string_value> string_key quote_key apostrophe_key
+%type <store_data>
+    DotedKey
+    Key
 
-
-%type  <pointer> Value Listable List InLinable InLineTable Pair
-
-%type <store_data> DotedKey Key
-
-%type <string_value> String KeyString Numeric
-
+%type <string_value> 
+    String
+    KeyString 
+    Numeric
+    MultiLineApostropheString
+    MultiLineQuoteString
+    ApostropheString
+    QuoteString
 
 %%
 
@@ -133,7 +166,7 @@ ArrayOfTables
             store_data_set_type($3,'a');
         }
         
-        STOREDATA s = store_data_new_table("table");
+        STOREDATA s = store_data_new_table("");
         store_data_add_value($3,s);
 
         table_in_use = s;
@@ -154,7 +187,7 @@ InLineTable
 
 InLinable
     : {
-        in_line_table = store_data_new_table("inlinable");
+        in_line_table = store_data_new_table("");
         g_ptr_array_insert(inline_stack, parsing_InLineTable, in_line_table); 
         parsing_InLineTable++;
     } 
@@ -173,7 +206,7 @@ List
 
 Listable
     : Value { 
-        STOREDATA s = store_data_new_array("listable"); 
+        STOREDATA s = store_data_new_array(""); 
         store_data_add_value(s,$1);
         $$ = s;
     }
@@ -224,10 +257,34 @@ Value
 
 
 String
-    : quote_string          { asprintf(&$$,"%s",$1); }
-    | apostrophe_string     { char * s = $1+1; s[strlen(s)-1] = '\0'; asprintf(&$$,"\"%s\"",s); }
-    | quote_tri_string      { asprintf(&$$,"%s",$1); }
-    | apostrophe_tri_string { asprintf(&$$,"%s",$1); }
+    : APOSTROPHE_TRI_OPEN MultiLineApostropheString APOSTROPHE_TRI_CLOSE { asprintf(&$$,"\"%s\"",$2); }
+    | QUOTE_TRI_OPEN MultiLineQuoteString QUOTE_TRI_CLOSE { asprintf(&$$,"\"%s\"",$2); }
+    | APOSTROPHE_OPEN ApostropheString APOSTROPHE_CLOSE { asprintf(&$$,"\"%s\"",$2); }
+    | QUOTE_OPEN QuoteString QUOTE_CLOSE { asprintf(&$$,"\"%s\"",$2); }
+;
+
+
+ApostropheString
+    : apostrophe_char                  { asprintf(&$$,"%s",$1); }
+    | ApostropheString apostrophe_char { asprintf(&$$,"%s%s",$1,$2); }
+;
+
+
+QuoteString
+    : quote_char             { asprintf(&$$,"%s",$1); }
+    | QuoteString quote_char { asprintf(&$$,"%s%s",$1,$2); }
+;
+
+
+MultiLineApostropheString
+    : apostrophe_char                           { asprintf(&$$,"%s",$1); }
+    | MultiLineApostropheString apostrophe_char { asprintf(&$$,"%s%s",$1,$2); }
+;
+
+
+MultiLineQuoteString
+    : quote_char                      { asprintf(&$$,"%s",$1); }
+    | MultiLineQuoteString quote_char { asprintf(&$$,"%s%s",$1,$2); }
 ;
 
 

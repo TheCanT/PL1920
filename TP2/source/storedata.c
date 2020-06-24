@@ -235,7 +235,7 @@ void print_it (gpointer key, gpointer value, gpointer user_data) {
     (*i)--;
     if (s)
         if (s->type=='h'){
-            if (!strcmp("table",(char *) key)) { printf("{");}
+            if (!strcmp("",(char *) key)) { printf("{");}
             else printf("\"%s\":{", (char *) key);
 
             int d = g_hash_table_size(s->data);
@@ -247,7 +247,7 @@ void print_it (gpointer key, gpointer value, gpointer user_data) {
         }
         else
         if (s->type=='a'){
-            if (!print_list || strcmp("listable",(char *) key)) printf("\"%s\":[", (char *) key);
+            if (!print_list || strcmp("",(char *) key)) printf("\"%s\":[", (char *) key);
             else printf("[");
 
             int r = 0;

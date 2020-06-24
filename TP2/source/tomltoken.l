@@ -20,17 +20,12 @@ boolean_regex (true|false)
 
 string_key [A-Za-z0-9_\-]+
 quote_key \"([^"]|\\\")*\"
-apostrophe_key \'([^']|\\\')*\'
+apostrophe_key \'[^']*\'
 
-/* key_regex ({key}|{key_quotes}) */
 
 
 quote_string \"([^"]|\\\")*\"
-apostrophe_string \'([^']|\\\')*\'
-quote_tri_string \'\'\'
-apostrophe_tri_string \"\"\"
-
-/* string_regex ({apostrophe_string}|{quote_string}) */
+apostrophe_string \'[^']*\'
 
 
 
@@ -61,15 +56,115 @@ offset_date_time {local_date_time}(Z|\-{offset})
 date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 
-%s VALUE IN_LINE_TABLE LIST
+%x VALUE IN_LINE_TABLE LIST QUOTE_STR_L APOSTROPHE_STR_L QUOTE_STR APOSTROPHE_STR
 
 %%
+
+<QUOTE_STR>\n {
+    yylval.string_value = strdup("\\n");
+    return quote_char;
+}
+<QUOTE_STR>\\ {
+    yylval.string_value = strdup("\\");
+    return quote_char;
+}
+<QUOTE_STR>\" {
+    yylval.string_value = strdup("\\\"");
+    return quote_char;
+}
+<QUOTE_STR>\\[\n\ ]+ {
+    yylval.string_value = "";
+    return quote_char;
+}
+
+<QUOTE_STR>\"\"\" {
+    yy_pop_state();
+    if(YYSTATE == VALUE) { yy_pop_state(); }
+    return QUOTE_TRI_CLOSE;
+}
+<VALUE>\"\"\"\n? {
+    yy_push_state(QUOTE_STR);
+    return QUOTE_TRI_OPEN;
+}
+
+<QUOTE_STR_L,QUOTE_STR>\\\" {
+    yylval.string_value = strdup(yytext);
+    return quote_char;
+}
+<QUOTE_STR_L>\" {
+    yy_pop_state();
+    if(YYSTATE == VALUE) { yy_pop_state(); }
+    return QUOTE_CLOSE;
+}
+<VALUE,LIST>\" {
+    yy_push_state(QUOTE_STR_L);
+    return QUOTE_OPEN;
+}
+
+<QUOTE_STR,QUOTE_STR_L>. {
+    yylval.string_value = strdup(yytext);
+    return quote_char;
+}
+
+
+
+
+<APOSTROPHE_STR,APOSTROPHE_STR_L>\\ {
+    yylval.string_value = strdup("\\\\");
+    return apostrophe_char;
+}
+<APOSTROPHE_STR,APOSTROPHE_STR_L>\" {
+    yylval.string_value = strdup("\\\"");
+    return apostrophe_char;
+}
+
+<APOSTROPHE_STR>\n {
+    yylval.string_value = strdup("\\n");
+    return apostrophe_char;
+}
+<APOSTROPHE_STR>\\\' {
+    yylval.string_value = strdup(yytext);
+    return apostrophe_char;
+}
+<APOSTROPHE_STR>[^\'\n] {
+    yylval.string_value = strdup(yytext);
+    return apostrophe_char;
+}
+<APOSTROPHE_STR>\'\'\' {
+    yy_pop_state();
+    if(YYSTATE == VALUE) { yy_pop_state(); }
+    return APOSTROPHE_TRI_CLOSE;
+}
+<VALUE>\'\'\'\n? {
+    yy_push_state(APOSTROPHE_STR);
+    return APOSTROPHE_TRI_OPEN;
+}
+
+<APOSTROPHE_STR_L>\' {
+    yy_pop_state();
+    if(YYSTATE == VALUE) { yy_pop_state(); }
+    return APOSTROPHE_CLOSE;
+}
+<VALUE,LIST>\' {
+    yy_push_state(APOSTROPHE_STR_L);
+    return APOSTROPHE_OPEN;
+}
+
+<APOSTROPHE_STR,APOSTROPHE_STR_L>. {
+    yylval.string_value = strdup(yytext);
+    return apostrophe_char;
+}
+
+
+
+
 <VALUE>\n { yy_pop_state(); }
 
-[ \t\n\r] ;
+
+<*>[ \t\n\r] ;
 
 
-\. {
+<*>\. {
     return KEY_TOKEN;
 }
 
@@ -106,7 +201,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-\= {
+<*>\= {
     yy_push_state(VALUE);
     return KEY_EQ_VALUE;
 }
@@ -147,33 +242,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-<VALUE,LIST>{apostrophe_string} {
-    if(YYSTATE == VALUE) yy_pop_state();
-    yylval.string_value = strdup(yytext);
-    return apostrophe_string;
-}
-
-
-<VALUE,LIST>{quote_string} {
-    if(YYSTATE == VALUE) yy_pop_state();
-    yylval.string_value = strdup(yytext);
-    return quote_string;
-}
-
-
-<VALUE,LIST>{apostrophe_tri_string} {
-    if(YYSTATE == VALUE) yy_pop_state();
-    yylval.string_value = strdup(yytext);
-    return apostrophe_tri_string;
-}
-
-
-<VALUE,LIST>{quote_tri_string} {
-    if(YYSTATE == VALUE) yy_pop_state();
-    yylval.string_value = strdup(yytext);
-    return quote_tri_string;
-}
-
 
 <INITIAL>\] {
     return CLOSE_TABLE;
@@ -195,32 +263,34 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-{string_key} {
+<INITIAL,IN_LINE_TABLE>{string_key} {
     yylval.string_value = strdup(yytext);
     return string_key;
 }
 
-{quote_key} {
+
+<INITIAL,IN_LINE_TABLE>{quote_key} {
     yylval.string_value = strdup(yytext);
     return quote_key;
 }
 
-{apostrophe_key} {
+
+<INITIAL,IN_LINE_TABLE>{apostrophe_key} {
     yylval.string_value = strdup(yytext);
     return apostrophe_key;
 }
 
 
-{comment_regex} ;
+<INITIAL,LIST,VALUE>{comment_regex} ;
 
 
-<<EOF>> {
+<*><<EOF>> {
    return END;
 }
 
 
-. {
-   puts("LOL ERRO TOKENS");
+<*>. {
+   puts("ERROR TOKEN .l");
    return 0;
 }
 

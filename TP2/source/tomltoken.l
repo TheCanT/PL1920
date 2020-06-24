@@ -1,4 +1,4 @@
-%option 8bit noyywrap yylineno stack
+%option 8bit noyywrap yylineno stack debug
 
 %{
 #include "storedata.h"
@@ -19,8 +19,8 @@ boolean_regex (true|false)
 
 
 string_key [A-Za-z0-9_\-]+
-quote_key \"([^"]|\\\")*\"
-apostrophe_key \'[^']*\'
+quote_key \"([^"\n]|\\\")*\"
+apostrophe_key \'[^'\n]*\'
 
 
 
@@ -96,7 +96,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
     return QUOTE_OPEN;
 }
 
-<QUOTE_STR,QUOTE_STR_L>. {
+<QUOTE_STR,QUOTE_STR_L>[^\n] {
     yylval.string_value = strdup(yytext);
     return quote_char;
 }
@@ -145,7 +145,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
     return APOSTROPHE_OPEN;
 }
 
-<APOSTROPHE_STR,APOSTROPHE_STR_L>. {
+<APOSTROPHE_STR,APOSTROPHE_STR_L>[^\n] {
     yylval.string_value = strdup(yytext);
     return apostrophe_char;
 }

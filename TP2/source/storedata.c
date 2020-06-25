@@ -128,6 +128,7 @@ STOREDATA store_data_next_key_value (STOREDATA sd, char * next_key) {
                 g_hash_table_insert(hTable, next->key, next);
 
             }
+            if ( next->type != 'v' && next->type != 'a' ) return NULL;
 
             break;
 

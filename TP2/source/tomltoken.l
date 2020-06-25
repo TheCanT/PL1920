@@ -1,4 +1,4 @@
-%option 8bit noyywrap yylineno stack debug
+%option 8bit noyywrap yylineno stack
 
 %{
 #include "storedata.h"
@@ -44,7 +44,7 @@ float_regex ({signal}?{integer}{fractional}?{exponent}?)
 
 offset {dig}{2}:{dig}{2}
 local_date {dig}{4}\-{dig}{2}\-{dig}{2}
-local_time {dig}{2}:{dig}{2}:{dig}{2}(\.{dig}{6})?
+local_time {dig}{2}:{dig}{2}:{dig}{2}(\.{dig}{1,6})?
 local_date_time {local_date}T{local_time}
 offset_date_time {local_date_time}(Z|\-{offset})
 

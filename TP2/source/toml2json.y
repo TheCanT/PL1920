@@ -125,10 +125,15 @@ S :
 
 
 Sequence
-    : Sequence Pair
-    | Sequence Table
-    | Sequence ArrayOfTables
-    |
+    : Sequence Sequencable
+    | Sequencable
+;
+
+
+Sequencable
+    : Pair
+    | Table
+    | ArrayOfTables
 ;
 
 
@@ -140,8 +145,10 @@ Table
     OPEN_TABLE Key CLOSE_TABLE 
     {
         table_in_use = $3;
-        store_data_set_data($3,g_hash_table_new(g_str_hash,g_str_equal));
-        store_data_set_type($3,'h');
+        if (store_data_get_type($3) == 'v') {
+            store_data_set_data($3,g_hash_table_new(g_str_hash,g_str_equal));
+            store_data_set_type($3,'h');
+        }
 
         parsing_Table = 0;
     }
@@ -210,15 +217,18 @@ Listable
 
 Pair
     : Key KEY_EQ_VALUE Value {
-        store_data_set_key($3,store_data_get_key($1));
-        store_data_add_value($1,$3);
+        if (store_data_get_type($1) == 'v') {
+            store_data_set_key($3,store_data_get_key($1));
+            store_data_add_value($1,$3);
+        }
+
         $$ = $1;
     }
 ;
 
 
 Key
-    : DotedKey KeyString { $$ = store_data_next_key_value($1,$2); }
+    : DotedKey KeyString { $$ = store_data_next_key_value($1,$2); if (!$$) return erroSem("Key NULL");}
 ;
 
 

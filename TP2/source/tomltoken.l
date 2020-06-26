@@ -294,7 +294,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 
 
 <*>. {
-   puts("ERROR TOKEN .l");
+   puts("ERROR TOKEN");
    return 0;
 }
 

@@ -1,0 +1,95 @@
+S
+    : Sequence END
+;
+
+Sequence
+    : Sequence Sequencable
+    | Sequencable
+;
+
+Sequencable
+    : Pair
+    | Table
+    | ArrayOfTables
+;
+
+Table
+    : OPEN_TABLE Key CLOSE_TABLE 
+;
+
+ArrayOfTables
+    : OPEN_ARRAY_OF_TABLES Key CLOSE_ARRAY_OF_TABLES
+;
+
+InLineTable
+    : OPEN_IN_LINE_TABLE InLinable CLOSE_IN_LINE_TABLE
+;
+
+InLinable
+    : Pair
+    | InLinable SEPARATE_VALUES Pair
+;
+
+List
+    : OPEN_LIST Listable CLOSE_LIST
+;
+
+Listable
+    : Value
+    | Listable SEPARATE_VALUES Value
+    | Listable SEPARATE_VALUES
+;
+
+Pair
+    : Key KEY_EQ_VALUE Value
+;
+
+Key
+    : DotedKey KeyString
+;
+
+DotedKey
+    : DotedKey KeyString KEY_TOKEN
+    | &
+;
+
+KeyString
+    : string_key
+    | APOSTROPHE_OPEN ApostropheString APOSTROPHE_CLOSE
+    | QUOTE_OPEN QuoteString QUOTE_CLOSE
+;
+
+Value
+    : String
+    | Numeric 
+    | boolean 
+    | date  
+    | List 
+    | InLineTable 
+;
+
+String
+    : APOSTROPHE_TRI_OPEN ApostropheString APOSTROPHE_TRI_CLOSE
+    | QUOTE_TRI_OPEN QuoteString QUOTE_TRI_CLOSE
+    | APOSTROPHE_OPEN ApostropheString APOSTROPHE_CLOSE
+    | QUOTE_OPEN QuoteString QUOTE_CLOSE 
+;
+
+ApostropheString
+    : apostrophe_char  
+    | ApostropheString apostrophe_char
+;
+
+QuoteString
+    : quote_char       
+    | QuoteString quote_char
+;
+
+Numeric
+    : yyfloat          
+    | integer          
+    | hex_numeric      
+    | oct_numeric      
+    | bin_numeric      
+    | undifined_numeric
+;

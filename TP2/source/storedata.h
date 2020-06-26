@@ -37,4 +37,6 @@ int store_data_add_value (STOREDATA sd, STOREDATA v);
 
 void print_2_JSON (STOREDATA s);
 
+void print_2_XML (STOREDATA s);
+
 #endif //__STORE_DATA_H__

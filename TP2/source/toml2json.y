@@ -4,6 +4,8 @@
 
 #include "storedata.h"
 
+char * type = NULL;
+
 STOREDATA global_table    = NULL;
 STOREDATA table_in_use    = NULL;
 STOREDATA in_line_table   = NULL;
@@ -94,7 +96,7 @@ int erroSem(char*);
     Pair
 
 %type <store_data>
-    DotedKey
+    DottedKey
     Key
 
 %type <string_value>
@@ -114,7 +116,8 @@ S :
     } 
       Sequence END 
     {
-        print_2_JSON(global_table);
+        if (type && !strcmp("-xml",type))print_2_XML(global_table);
+        else print_2_JSON(global_table);
         return 0; 
     }
 ;
@@ -224,12 +227,12 @@ Pair
 
 
 Key
-    : DotedKey KeyString { $$ = store_data_next_key_value($1,$2); if (!$$) return erroSem("Key NULL");}
+    : DottedKey KeyString { $$ = store_data_next_key_value($1,$2); if (!$$) return erroSem("Key NULL");}
 ;
 
 
-DotedKey
-    : DotedKey KeyString KEY_TOKEN { $$ = store_data_next_key($1,$2); }
+DottedKey
+    : DottedKey KeyString KEY_TOKEN { $$ = store_data_next_key($1,$2); }
     | { 
         if (parsing_InLineTable > 0 && !parsing_Table) $$ = in_line_table;
         else $$ = table_in_use;
@@ -285,7 +288,8 @@ Numeric
 
 %%
 
-int main(){
+int main(int argc, char ** argv){
+    if (argc > 1) type = argv[1];
     yyparse();
     return 0;
 }

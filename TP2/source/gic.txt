@@ -45,11 +45,11 @@ Pair
 ;
 
 Key
-    : DotedKey KeyString
+    : DottedKey KeyString
 ;
 
-DotedKey
-    : DotedKey KeyString KEY_TOKEN
+DottedKey
+    : DottedKey KeyString KEY_TOKEN
     | &
 ;
 

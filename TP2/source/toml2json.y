@@ -280,9 +280,9 @@ QuoteString
 Numeric
     : yyfloat           { $$ = take_of_under_score( *$1 == '+' ? $1 + 1 : $1 ); }
     | integer           { $$ = take_of_under_score( *$1 == '+' ? $1 + 1 : $1 ); }
-    | hex_numeric       { asprintf(&$$,"%ld",strtol($1+2,NULL,16)); }
-    | oct_numeric       { asprintf(&$$,"%ld",strtol($1+2,NULL,8)); }
-    | bin_numeric       { asprintf(&$$,"%ld",strtol($1+2,NULL,2)); }
+    | hex_numeric       { asprintf(&$$,"%ld",strtol(take_of_under_score($1+2),NULL,16)); }
+    | oct_numeric       { asprintf(&$$,"%ld",strtol(take_of_under_score($1+2),NULL,8)); }
+    | bin_numeric       { asprintf(&$$,"%ld",strtol(take_of_under_score($1+2),NULL,2)); }
     | undifined_numeric { asprintf(&$$,"\"%s\"",$1); }
 ;
 

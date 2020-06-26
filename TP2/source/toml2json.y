@@ -74,13 +74,11 @@ int erroSem(char*);
 %token <string_value>
     undifined_numeric
     apostrophe_char
-    apostrophe_key
     hex_numeric
     oct_numeric
     bin_numeric
     string_key
     quote_char
-    quote_key
     boolean
     integer
     yyfloat
@@ -99,9 +97,7 @@ int erroSem(char*);
     DotedKey
     Key
 
-%type <string_value> 
-    MultiLineApostropheString
-    MultiLineQuoteString
+%type <string_value>
     ApostropheString
     QuoteString
     KeyString 
@@ -235,58 +231,46 @@ Key
 DotedKey
     : DotedKey KeyString KEY_TOKEN { $$ = store_data_next_key($1,$2); }
     | { 
-        $$ = table_in_use;
-        if (parsing_InLineTable   > 0 && !parsing_Table) $$ = in_line_table;
+        if (parsing_InLineTable > 0 && !parsing_Table) $$ = in_line_table;
+        else $$ = table_in_use;
     }
 ;
 
 
 KeyString
-    : string_key        { asprintf(&$$,"%s",$1); }
-    | quote_key         { char * s = $1+1; s[strlen(s)-1] = '\0'; asprintf(&$$,"%s",s); }
-    | apostrophe_key    { char * s = $1+1; s[strlen(s)-1] = '\0'; asprintf(&$$,"%s",s); }
+    : string_key                                        { asprintf(&$$,"%s",$1); }
+    | APOSTROPHE_OPEN ApostropheString APOSTROPHE_CLOSE { asprintf(&$$,"%s",$2); }
+    | QUOTE_OPEN QuoteString QUOTE_CLOSE                { asprintf(&$$,"%s",$2); }
 ;
 
 
 Value
-    : String        { $$ = store_data_new ('s', "", $1); }
-    | Numeric       { $$ = store_data_new ('s', "", $1); }
-    | boolean       { $$ = store_data_new ('s', "", $1); }
-    | date          { char * s; asprintf(&s,"\"%s\"",$1); $$ = store_data_new ('s', "", s); }
+    : String        { $$ = store_data_new('s', "", $1); }
+    | Numeric       { $$ = store_data_new('s', "", $1); }
+    | boolean       { $$ = store_data_new('s', "", $1); }
+    | date          { char * s; asprintf(&s,"\"%s\"",$1); $$ = store_data_new('s', "", s); }
     | List          { $$ = $1; }
     | InLineTable   { $$ = $1; }
 ;
 
 
 String
-    : APOSTROPHE_TRI_OPEN MultiLineApostropheString APOSTROPHE_TRI_CLOSE { asprintf(&$$,"\"%s\"",$2); }
-    | QUOTE_TRI_OPEN MultiLineQuoteString QUOTE_TRI_CLOSE                { asprintf(&$$,"\"%s\"",$2); }
-    | APOSTROPHE_OPEN ApostropheString APOSTROPHE_CLOSE                  { asprintf(&$$,"\"%s\"",$2); }
-    | QUOTE_OPEN QuoteString QUOTE_CLOSE                                 { asprintf(&$$,"\"%s\"",$2); }
+    : APOSTROPHE_TRI_OPEN ApostropheString APOSTROPHE_TRI_CLOSE { asprintf(&$$,"\"%s\"",$2); }
+    | QUOTE_TRI_OPEN QuoteString QUOTE_TRI_CLOSE                { asprintf(&$$,"\"%s\"",$2); }
+    | APOSTROPHE_OPEN ApostropheString APOSTROPHE_CLOSE         { asprintf(&$$,"\"%s\"",$2); }
+    | QUOTE_OPEN QuoteString QUOTE_CLOSE                        { asprintf(&$$,"\"%s\"",$2); }
 ;
 
 
 ApostropheString
-    : apostrophe_char                   { asprintf(&$$,"%s",$1); }
-    | ApostropheString apostrophe_char  { asprintf(&$$,"%s%s",$1,$2); }
+    : apostrophe_char                  { asprintf(&$$,"%s",$1); }
+    | ApostropheString apostrophe_char { asprintf(&$$,"%s%s",$1,$2); }
 ;
 
 
 QuoteString
-    : quote_char                { asprintf(&$$,"%s",$1); }
-    | QuoteString quote_char    { asprintf(&$$,"%s%s",$1,$2); }
-;
-
-
-MultiLineApostropheString
-    : apostrophe_char                           { asprintf(&$$,"%s",$1); }
-    | MultiLineApostropheString apostrophe_char { asprintf(&$$,"%s%s",$1,$2); }
-;
-
-
-MultiLineQuoteString
-    : quote_char                        { asprintf(&$$,"%s",$1); }
-    | MultiLineQuoteString quote_char   { asprintf(&$$,"%s%s",$1,$2); }
+    : quote_char             { asprintf(&$$,"%s",$1); }
+    | QuoteString quote_char { asprintf(&$$,"%s%s",$1,$2); }
 ;
 
 

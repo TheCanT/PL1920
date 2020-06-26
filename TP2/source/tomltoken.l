@@ -19,8 +19,6 @@ boolean_regex (true|false)
 
 
 string_key [A-Za-z0-9_\-]+
-quote_key \"([^"\n]|\\\")*\"
-apostrophe_key \'[^'\n]*\'
 
 
 
@@ -91,7 +89,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
     if(YYSTATE == VALUE) { yy_pop_state(); }
     return QUOTE_CLOSE;
 }
-<VALUE,LIST>\" {
+<INITIAL,VALUE,LIST,IN_LINE_TABLE>\" {
     yy_push_state(QUOTE_STR_L);
     return QUOTE_OPEN;
 }
@@ -140,7 +138,7 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
     if(YYSTATE == VALUE) { yy_pop_state(); }
     return APOSTROPHE_CLOSE;
 }
-<VALUE,LIST>\' {
+<INITIAL,VALUE,LIST,IN_LINE_TABLE>\' {
     yy_push_state(APOSTROPHE_STR_L);
     return APOSTROPHE_OPEN;
 }
@@ -285,16 +283,6 @@ date_regex ({local_date}|{local_time}|{local_date_time}|{offset_date_time})
 }
 
 
-<INITIAL,IN_LINE_TABLE>{quote_key} {
-    yylval.string_value = strdup(yytext);
-    return quote_key;
-}
-
-
-<INITIAL,IN_LINE_TABLE>{apostrophe_key} {
-    yylval.string_value = strdup(yytext);
-    return apostrophe_key;
-}
 
 
 <INITIAL,LIST,VALUE>{comment_regex} ;

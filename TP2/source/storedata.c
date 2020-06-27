@@ -321,11 +321,7 @@ void print_xml (gpointer key, gpointer value, gpointer user_data) {
             else
                 printf("<list type=\"list\">");
 
-            //print_list++;
-
             g_ptr_array_foreach((GPtrArray *)s->data, print_x, NULL);
-
-            //print_list--;
 
             if (strcmp("",(char *) key))
                 printf("</%s>",(char *) key);
@@ -337,10 +333,8 @@ void print_xml (gpointer key, gpointer value, gpointer user_data) {
         if (s->type=='s') {
             if (!strcmp("",(char *) key))
                 printf("<value type=\"value\">%s</value>",(char *) s->data);
-                //printf("<value v=%s />",(char *) s->data);
             else 
                 printf("<%s type=\"value\">%s</%s>",(char *) key, (char *) s->data, (char *) key);
-                //printf("<%s v=%s />",(char *) key, (char *) s->data);
         
         }
 }

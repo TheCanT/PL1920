@@ -336,10 +336,10 @@ void print_xml (gpointer key, gpointer value, gpointer user_data) {
         else
         if (s->type=='s') {
             if (!strcmp("",(char *) key))
-                printf("<value>%s</value>",(char *) s->data);
+                printf("<value type=\"value\">%s</value>",(char *) s->data);
                 //printf("<value v=%s />",(char *) s->data);
             else 
-                printf("<%s>%s</%s>",(char *) key, (char *) s->data, (char *) key);
+                printf("<%s type=\"value\">%s</%s>",(char *) key, (char *) s->data, (char *) key);
                 //printf("<%s v=%s />",(char *) key, (char *) s->data);
         
         }
@@ -348,9 +348,9 @@ void print_xml (gpointer key, gpointer value, gpointer user_data) {
 
 void print_2_XML (STOREDATA s) {
     if (s) {
-        printf("<object>");
+        printf("<xml =\"object\">");
         int i = g_hash_table_size(s->data);
         g_hash_table_foreach((GHashTable *) s->data, print_xml, &i);
-        printf("</object>");
+        printf("</xml>");
     }
 }

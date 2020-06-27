@@ -1,0 +1,57 @@
+<xml ="object">
+    <clients type="object">
+        <data type="list">
+            <list type="list">
+                <value type="value">"gamma"</value>
+                <value type="value">"delta"</value>
+            </list>
+            <list type="list">
+                <value type="value">1</value>
+                <value type="value">2</value>
+            </list>
+        </data>
+        <hosts type="list">
+            <value type="value">"alpha"</value>
+            <value type="value">"omega"</value>
+        </hosts>
+    </clients>
+    <servers type="object">
+        <alpha type="object">
+            <ip type="value">"10.0.0.1"</ip>
+            <dc type="value">"eqdc10"</dc>
+        </alpha>
+        <beta type="object">
+            <ip type="value">"10.0.0.2"</ip>
+            <country type="value">"中国"</country>
+            <dc type="value">"eqdc10"</dc>
+        </beta>
+    </servers>
+    <database type="object">
+        <enabled type="value">true</enabled>
+        <connection_max type="value">5000</connection_max>
+        <server type="value">"192.168.1.1"</server>
+        <ports type="list">
+            <value type="value">8001</value>
+            <value type="value">8001</value>
+            <value type="value">8002</value>
+        </ports>
+    </database>
+    <title type="value">"TOML Example"</title>
+    <owner type="object">
+        <name type="value">"Tom Preston-Werner"</name>
+        <organization type="value">"GitHub"</organization>
+        <dob type="value">"1979-05-27T07:32:00Z"</dob>
+        <bio type="value">"GitHub Cofounder & CEO\nLikes tater tots and beer."</bio>
+    </owner>
+    <products type="list">
+        <object type="object">
+            <name type="value">"Hammer"</name>
+            <sku type="value">738594937</sku>
+        </object>
+        <object type="object">
+            <color type="value">"gray"</color>
+            <name type="value">"Nail"</name>
+            <sku type="value">284758393</sku>
+        </object>
+    </products>
+</xml>

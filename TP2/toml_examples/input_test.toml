@@ -104,3 +104,8 @@ ip = "456"
   name = "banana"
   [[fruit.variety]]
     name = "plantain"
+
+
+1 = { terceiro = [ 1, "'a'", [ 98, 1 ] ], segundo = { bool ="false", kkk = { another = 1 }, lol = "feu" } }
+
+3 = { segundo = { bool ="false", kkk = { another = 1 }, lol = "feu" }, terceiro = [ 1, "'a'", [ 98, 1 ] ] }

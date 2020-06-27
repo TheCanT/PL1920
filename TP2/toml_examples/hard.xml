@@ -1,0 +1,23 @@
+<xml ="object">
+    <the type="object">
+        <test_string type="value">"You'll hate me after this - #"</test_string>
+        <hard type="object">
+            <harder_test_string type="value">" And when \"'s are in the string, along with # \""</harder_test_string>
+            <test_array type="list">
+                <value type="value">"] "</value>
+                <value type="value">" # "</value>
+            </test_array>
+            <test_array2 type="list">
+                <value type="value">"Test #11 ]proved that"</value>
+                <value type="value">"Experiment #9 was a success"</value>
+            </test_array2>
+            <bit# type="object">
+                <multi_line_array type="list">
+                    <value type="value">"]"</value>
+                </multi_line_array>
+                <what? type="value">"You don't think some user won't do that?"</what?>
+            </bit#>
+            <another_test_string type="value">" Same thing, but with a string #"</another_test_string>
+        </hard>
+    </the>
+</xml>

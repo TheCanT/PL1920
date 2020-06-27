@@ -24,3 +24,11 @@ lex.yy.c : tomltoken.l y.tab.h
 
 clean :
 	rm -rf y.tab.c y.tab.h lex.yy.c *.o *.gch *.exe
+
+
+zipcode : toml2json.y tomltoken.l storedata.c storedata.h
+	zip -o codezip toml2json.y tomltoken.l storedata.c storedata.h
+
+
+zip_tp2 : ../source ../toml_examples
+	zip -o entrega -r ../source ../toml_examples relatorio.pdf

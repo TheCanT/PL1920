@@ -1,0 +1,200 @@
+<xml ="object">
+    <list type="list">
+        <object type="object">
+            <ip type="value">"123"</ip>
+        </object>
+        <object type="object">
+            <ip type="value">"456"</ip>
+        </object>
+    </list>
+    <pair type="object">
+        <one type="object">
+            <1nt_s type="list">
+                <value type="value">99</value>
+                <value type="value">42</value>
+                <value type="value">0</value>
+                <value type="value">-17</value>
+                <value type="value">1000</value>
+                <value type="value">5349221</value>
+                <value type="value">12345</value>
+                <value type="value">3735928559</value>
+                <value type="value">3735928559</value>
+                <value type="value">493</value>
+                <value type="value">214</value>
+            </1nt_s>
+            <d4.t3s type="list">
+                <value type="value">"1979-05-27T07:32:00Z"</value>
+                <value type="value">"1979-05-27T00:32:00-07:00"</value>
+                <value type="value">"1979-05-27T00:32:00.999999-07:00"</value>
+                <value type="value">"1979-05-27T07:32:00"</value>
+                <value type="value">"1979-05-27T00:32:00.999999"</value>
+                <value type="value">"1979-05-27"</value>
+                <value type="value">"07:32:00"</value>
+                <value type="value">"00:32:00.999999"</value>
+            </d4.t3s>
+            <fl0.at-s type="list">
+                <value type="value">1.0</value>
+                <value type="value">3.1415</value>
+                <value type="value">-0.01</value>
+                <value type="value">5e+22</value>
+                <value type="value">1e06</value>
+                <value type="value">-2E-2</value>
+                <value type="value">6.626e-34</value>
+                <value type="value">224617.445991228</value>
+                <value type="value">"inf"</value>
+                <value type="value">"+inf"</value>
+                <value type="value">"-inf"</value>
+                <value type="value">"nan"</value>
+                <value type="value">"+nan"</value>
+                <value type="value">"-nan"</value>
+            </fl0.at-s>
+            <random_string type="list">
+                <value type="value">"its a string"</value>
+            </random_string>
+        </one>
+    </pair>
+    <a-table type="object">
+        <lel type="value">123.2</lel>
+        <inside type="object">
+            <nestedArray type="list">
+                <object type="object">
+                    <cool type="object">
+                        <abc type="list">
+                            <list type="list">
+                                <value type="value">1</value>
+                                <value type="value">1.2</value>
+                                <list type="list">
+                                    <value type="value">"ola"</value>
+                                    <value type="value">"adeus"</value>
+                                </list>
+                            </list>
+                            <value type="value">"asd"</value>
+                            <value type="value">3</value>
+                        </abc>
+                    </cool>
+                    <primeiro type="object">
+                        <segundo type="object">
+                            <l type="value">"false"</l>
+                            <bonk type="object">
+                                <l type="list">
+                                    <value type="value">1</value>
+                                    <value type="value">"'a'"</value>
+                                    <list type="list">
+                                        <value type="value">98</value>
+                                        <value type="value">1</value>
+                                    </list>
+                                </l>
+                            </bonk>
+                        </segundo>
+                    </primeiro>
+                </object>
+                <object type="object">
+                    <cool type="object">
+                        <loco type="value">1e2</loco>
+                    </cool>
+                    <primeiro type="object">
+                        <segundo type="object">
+                            <l type="object">
+                                <bool type="value">"false"</bool>
+                            </l>
+                            <bonk type="object">
+                                <l type="list">
+                                    <value type="value">1</value>
+                                    <value type="value">"'a'"</value>
+                                    <list type="list">
+                                        <value type="value">98</value>
+                                        <value type="value">1</value>
+                                    </list>
+                                </l>
+                            </bonk>
+                        </segundo>
+                    </primeiro>
+                </object>
+            </nestedArray>
+            <ip2 type="value">"789"</ip2>
+        </inside>
+    </a-table>
+    <orange type="object">
+        <skin type="value">"thick"</skin>
+        <color type="value">"orange"</color>
+        <type type="value">"fruit"</type>
+    </orange>
+    <k type="object">
+        <a type="object">
+            <a type="object">
+                <lol type="value">1023</lol>
+            </a>
+        </a>
+    </k>
+    <fruit type="list">
+        <object type="object">
+            <physical type="object">
+                <shape type="value">"round"</shape>
+                <color type="value">"red"</color>
+            </physical>
+            <variety type="list">
+                <object type="object">
+                    <name type="value">"red delicious"</name>
+                </object>
+                <object type="object">
+                    <name type="value">"granny smith"</name>
+                </object>
+            </variety>
+            <name type="value">"apple"</name>
+        </object>
+        <object type="object">
+            <variety type="list">
+                <object type="object">
+                    <1 type="object">
+                        <segundo type="object">
+                            <bool type="value">"false"</bool>
+                            <kkk type="object">
+                                <another type="value">1</another>
+                            </kkk>
+                            <lol type="value">"feu"</lol>
+                        </segundo>
+                        <terceiro type="list">
+                            <value type="value">1</value>
+                            <value type="value">"'a'"</value>
+                            <list type="list">
+                                <value type="value">98</value>
+                                <value type="value">1</value>
+                            </list>
+                        </terceiro>
+                    </1>
+                    <3 type="object">
+                        <segundo type="object">
+                            <bool type="value">"false"</bool>
+                            <kkk type="object">
+                                <another type="value">1</another>
+                            </kkk>
+                            <lol type="value">"feu"</lol>
+                        </segundo>
+                        <terceiro type="list">
+                            <value type="value">1</value>
+                            <value type="value">"'a'"</value>
+                            <list type="list">
+                                <value type="value">98</value>
+                                <value type="value">1</value>
+                            </list>
+                        </terceiro>
+                    </3>
+                    <name type="value">"plantain"</name>
+                </object>
+            </variety>
+            <name type="value">"banana"</name>
+        </object>
+    </fruit>
+    <complex type="object">
+        <booleans type="list">
+            <value type="value">true</value>
+            <value type="value">false</value>
+        </booleans>
+        <t type="value">"thisisastring"</t>
+    </complex>
+    <apple type="object">
+        <skin type="value">"thin"</skin>
+        <color type="value">"red"</color>
+        <type type="value">"fruit"</type>
+    </apple>
+</xml>

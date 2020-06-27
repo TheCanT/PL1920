@@ -1,0 +1,152 @@
+{
+    "Table": {
+        "key": "value"
+    },
+    "Datetime": {
+        "key1": "1979-05-27T07:32:00Z",
+        "key3": "1979-05-27T00:32:00.999999-07:00",
+        "key2": "1979-05-27T00:32:00-07:00"
+    },
+    "Integer": {
+        "key1": 99,
+        "key3": 0,
+        "key2": 42,
+        "key4": -17
+    },
+    "Booleans": {
+        "True": true,
+        "False": false
+    },
+    "Float": {
+        "fractional": {
+            "key1": 1.0,
+            "key3": -0.01,
+            "key2": 3.1415
+        },
+        "both": {
+            "key": 6.626e-34
+        },
+        "exponent": {
+            "key1": 5e+22,
+            "key3": -2E-2,
+            "key2": 1e6
+        }
+    },
+    "dog": {
+        "tater": {
+            "type": "pug"
+        }
+    },
+    "x": {
+        "y": {
+            "z": {
+                "w": {}
+            }
+        }
+    },
+    "products": [
+        {
+            "name": "Hammer",
+            "sku": 738594937
+        },
+        {},
+        {
+            "color": "gray",
+            "name": "Nail",
+            "sku": 284758393
+        }
+    ],
+    "String": {
+        "basic": "I'm a string. \"You can quote me\". Name\tJos\u00E9\nLocation\tSF.",
+        "Multilined": {
+            "Singleline": {
+                "key1": "The quick brown fox jumps over the lazy dog.",
+                "key3": "The quick brown fox jumps over the lazy dog.",
+                "key2": "The quick brown fox jumps over the lazy dog."
+            }
+        },
+        "Multiline": {
+            "key1": "One\nTwo",
+            "key3": "One\nTwo",
+            "key2": "One\nTwo"
+        },
+        "Literal": {
+            "winpath": "C:\\Users\\nodejs\\templates",
+            "winpath2": "\\\\ServerX\\admin$\\system32\\",
+            "quoted": "Tom \"Dubs\" Preston-Werner",
+            "regex": "<\\i\\c*\\s*>",
+            "Multiline": {
+                "regex2": "I [dw]on't need \\d{2} apples",
+                "lines": "The first newline is\ntrimmed in raw strings.\n   All other whitespace\n   is preserved.\n"
+            }
+        }
+    },
+    "Array": {
+        "key1": [
+            1,
+            2,
+            3
+        ],
+        "key3": [
+            [
+                1,
+                2
+            ],
+            [
+                3,
+                4,
+                5
+            ]
+        ],
+        "key5": [
+            1,
+            2,
+            3
+        ],
+        "key2": [
+            "red",
+            "yellow",
+            "green"
+        ],
+        "key4": [
+            [
+                1,
+                2
+            ],
+            [
+                "a",
+                "b",
+                "c"
+            ]
+        ],
+        "key6": [
+            1,
+            2
+        ]
+    },
+    "fruit": [
+        {
+            "physical": {
+                "shape": "round",
+                "color": "red"
+            },
+            "variety": [
+                {
+                    "name": "red delicious"
+                },
+                {
+                    "name": "granny smith"
+                }
+            ],
+            "name": "apple"
+        },
+        {
+            "variety": [
+                {
+                    "name": "plantain"
+                }
+            ],
+            "name": "banana"
+        }
+    ]
+}

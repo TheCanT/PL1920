@@ -1,0 +1,200 @@
+{
+    "list": [
+        {
+            "ip": "123"
+        },
+        {
+            "ip": "456"
+        }
+    ],
+    "pair": {
+        "one": {
+            "1nt_s": [
+                99,
+                42,
+                0,
+                -17,
+                1000,
+                5349221,
+                12345,
+                3735928559,
+                3735928559,
+                493,
+                214
+            ],
+            "d4.t3s": [
+                "1979-05-27T07:32:00Z",
+                "1979-05-27T00:32:00-07:00",
+                "1979-05-27T00:32:00.999999-07:00",
+                "1979-05-27T07:32:00",
+                "1979-05-27T00:32:00.999999",
+                "1979-05-27",
+                "07:32:00",
+                "00:32:00.999999"
+            ],
+            "fl0.at-s": [
+                1.0,
+                3.1415,
+                -0.01,
+                5e+22,
+                1e06,
+                -2E-2,
+                6.626e-34,
+                224617.445991228,
+                "inf",
+                "+inf",
+                "-inf",
+                "nan",
+                "+nan",
+                "-nan"
+            ],
+            "random_string": [
+                "its a string"
+            ]
+        }
+    },
+    "a-table": {
+        "lel": 123.2,
+        "inside": {
+            "nestedArray": [
+                {
+                    "cool": {
+                        "abc": [
+                            [
+                                1,
+                                1.2,
+                                [
+                                    "ola",
+                                    "adeus"
+                                ]
+                            ],
+                            "asd",
+                            3
+                        ]
+                    },
+                    "primeiro": {
+                        "segundo": {
+                            "l": "false",
+                            "bonk": {
+                                "l": [
+                                    1,
+                                    "'a'",
+                                    [
+                                        98,
+                                        1
+                                    ]
+                                ]
+                            }
+                        }
+                    }
+                },
+                {
+                    "cool": {
+                        "loco": 1e2
+                    },
+                    "primeiro": {
+                        "segundo": {
+                            "l": {
+                                "bool": "false"
+                            },
+                            "bonk": {
+                                "l": [
+                                    1,
+                                    "'a'",
+                                    [
+                                        98,
+                                        1
+                                    ]
+                                ]
+                            }
+                        }
+                    }
+                }
+            ],
+            "ip2": "789"
+        }
+    },
+    "orange": {
+        "skin": "thick",
+        "color": "orange",
+        "type": "fruit"
+    },
+    "k": {
+        "a": {
+            "a": {
+                "lol": 1023
+            }
+        }
+    },
+    "fruit": [
+        {
+            "physical": {
+                "shape": "round",
+                "color": "red"
+            },
+            "variety": [
+                {
+                    "name": "red delicious"
+                },
+                {
+                    "name": "granny smith"
+                }
+            ],
+            "name": "apple"
+        },
+        {
+            "variety": [
+                {
+                    "1": {
+                        "segundo": {
+                            "bool": "false",
+                            "kkk": {
+                                "another": 1
+                            },
+                            "lol": "feu"
+                        },
+                        "terceiro": [
+                            1,
+                            "'a'",
+                            [
+                                98,
+                                1
+                            ]
+                        ]
+                    },
+                    "3": {
+                        "segundo": {
+                            "bool": "false",
+                            "kkk": {
+                                "another": 1
+                            },
+                            "lol": "feu"
+                        },
+                        "terceiro": [
+                            1,
+                            "'a'",
+                            [
+                                98,
+                                1
+                            ]
+                        ]
+                    },
+                    "name": "plantain"
+                }
+            ],
+            "name": "banana"
+        }
+    ],
+    "complex": {
+        "booleans": [
+            true,
+            false
+        ],
+        "t": "thisisastring"
+    },
+    "apple": {
+        "skin": "thin",
+        "color": "red",
+        "type": "fruit"
+    }
+}

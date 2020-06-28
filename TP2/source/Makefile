@@ -31,4 +31,4 @@ zipcode : toml2json.y tomltoken.l storedata.c storedata.h
 
 
 zip_tp2 : ../source ../toml_examples
-	zip -o G15_TP2_EX4.zip -r ../source ../toml_examples relatorio.pdf
+	zip -o G15_TP2_EX4.zip -r ../source ../toml_examples ../relatorio.pdf

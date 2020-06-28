@@ -124,12 +124,12 @@ S :
 
 
 Sequence
-    : Sequence Sequencable
-    | Sequencable
+    : Sequence Sequenciable
+    | Sequenciable
 ;
 
 
-Sequencable
+Sequenciable
     : Pair
     | Table
     | ArrayOfTables

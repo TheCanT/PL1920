@@ -1,12 +1,12 @@
-(./toml2json.exe < ../toml_examples/example.toml) > example.json
-(./toml2json.exe < ../toml_examples/example-v0.4.toml) > examplev4.json
-(./toml2json.exe < ../toml_examples/example-v0.3.toml) > examplev3.json
-(./toml2json.exe < ../toml_examples/fruit.toml) > fruit.json
-(./toml2json.exe < ../toml_examples/hard_example.toml) > hard.json
-(./toml2json.exe < ../toml_examples/hard_example_unicode.toml) > hard_unicode.json
-(./toml2json.exe < ../toml_examples/input_test.toml) > input.json
+(./toml2json < ../toml_examples/example.toml) > example.json
+(./toml2json < ../toml_examples/example-v0.4.toml) > examplev4.json
+(./toml2json < ../toml_examples/example-v0.3.toml) > examplev3.json
+(./toml2json < ../toml_examples/fruit.toml) > fruit.json
+(./toml2json < ../toml_examples/hard_example.toml) > hard.json
+(./toml2json < ../toml_examples/hard_example_unicode.toml) > hard_unicode.json
+(./toml2json < ../toml_examples/input_test.toml) > input.json
 
 
-(./toml2json.exe -xml < ../toml_examples/hard_example.toml) > hard.xml
-(./toml2json.exe -xml < ../toml_examples/input_test.toml) > input.xml
-(./toml2json.exe -xml < ../toml_examples/example.toml) > example.xml
+(./toml2json -xml < ../toml_examples/hard_example.toml) > hard.xml
+(./toml2json -xml < ../toml_examples/input_test.toml) > input.xml
+(./toml2json -xml < ../toml_examples/example.toml) > example.xml

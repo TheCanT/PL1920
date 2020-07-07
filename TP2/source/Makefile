@@ -1,5 +1,5 @@
 toml2json.exe : y.tab.o lex.yy.o storedata.o
-	gcc -o toml2json.exe y.tab.o lex.yy.o storedata.o `pkg-config --cflags --libs glib-2.0` -ll
+	gcc -o toml2json y.tab.o lex.yy.o storedata.o `pkg-config --cflags --libs glib-2.0` -ll
 
 
 y.tab.o : y.tab.c storedata.c storedata.h

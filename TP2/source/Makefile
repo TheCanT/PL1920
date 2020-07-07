@@ -1,4 +1,4 @@
-toml2json.exe : y.tab.o lex.yy.o storedata.o
+toml2json : y.tab.o lex.yy.o storedata.o
 	gcc -o toml2json y.tab.o lex.yy.o storedata.o `pkg-config --cflags --libs glib-2.0` -ll
 
 
@@ -23,7 +23,7 @@ lex.yy.c : tomltoken.l y.tab.h
 
 
 clean :
-	rm -rf y.tab.c y.tab.h lex.yy.c *.o *.gch *.exe
+	rm -rf y.tab.c y.tab.h lex.yy.c *.o *.gch toml2json
 
 
 zipcode : toml2json.y tomltoken.l storedata.c storedata.h

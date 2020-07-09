@@ -4,7 +4,7 @@ University Project
 
 ## Authors
 
-* **Beatriz Rocha**  - [Github](https://github.com/)
+* **Beatriz Rocha**  - [Github](https://github.com/beatrizfrocha)
 * **Filipe Guimarães** - [Github](https://github.com/filipeguimaraes)
 * **Gonçalo Ferreira** - [Github](https://github.com/TheCanT)
 
